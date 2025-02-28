@@ -70,6 +70,7 @@ Clone the repository : git clone https://github.com/Lulippe-Hiboude/SafetyNetAle
 The API uses standard HTTP status codes to indicate the result of an API request.  
 Some common responses:  
 -200 OK: The request was successful  
+-204 No Content: The request is valide but no match was found  
 -400 Bad Request: The request is malformed or missing parameters  
 -404 Not Found: The resource could not be found  
 -500 Internal Server Error: A server-side error occurred
