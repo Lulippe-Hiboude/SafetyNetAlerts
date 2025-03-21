@@ -36,6 +36,7 @@
         <mockito.version>5.13.0</mockito.version>
         <swagger.version>2.2.9</swagger.version>
         <log4j.version>2.23.1</log4j.version>
+        <lombok.version>1.18.36</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <jackson.version>2.17.2</jackson.version>
         <jacoco.version>0.8.12</jacoco.version>
@@ -62,7 +63,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -145,6 +147,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
