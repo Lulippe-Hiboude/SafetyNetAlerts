@@ -1,4 +1,4 @@
-package com.lulippe.safetynetalerts.dto;
+package com.lulippe.safetynetalerts.dao;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lulippe.safetynetalerts.model.FireStation;
 import com.lulippe.safetynetalerts.model.MedicalRecord;

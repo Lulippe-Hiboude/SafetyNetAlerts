@@ -1,8 +1,8 @@
 package com.lulippe.safetynetalerts.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.lulippe.safetynetalerts.dto.DataContainer;
-import com.lulippe.safetynetalerts.exception.DataLoadingException;
+import com.lulippe.safetynetalerts.dao.DataContainer;
+import com.lulippe.safetynetalerts.exception.json_exception.DataLoadingException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ class JsonUtilTest {
     @DisplayName("should convert Json to Object")
     void shouldConvertJsonToObject() throws IOException {
         //given
-        String json = new String(Files.readAllBytes(Paths.get("src/test/java/resources/json/testData.json")));
+        String json = new String(Files.readAllBytes(Paths.get("src/test/resources/json/testData.json")));
         TypeReference<DataContainer> typeReference = new TypeReference<>() {
         };
 
@@ -30,7 +30,7 @@ class JsonUtilTest {
         //then
         assertNotNull(dataContainer);
         assertEquals(1, dataContainer.getPersons().size());
-        assertEquals("John", dataContainer.getPersons().getFirst().getFirstName());
+        assertEquals("Johnny", dataContainer.getPersons().getFirst().getFirstName());
         assertEquals(1, dataContainer.getFireStations().size());
         assertEquals("1509 Culver St", dataContainer.getFireStations().getFirst().getAddress());
         assertEquals(1, dataContainer.getMedicalRecords().size());
@@ -42,7 +42,7 @@ class JsonUtilTest {
     @DisplayName("should throw an error if the json file is malformed")
     void shouldThrowAnErrorIfJsonFileIsMalformed() throws IOException {
         //given
-        String malformedJson = new String(Files.readAllBytes(Paths.get("src/test/java/resources/json/malformedData.json")));
+        String malformedJson = new String(Files.readAllBytes(Paths.get("src/test/resources/json/malformedData.json")));
         TypeReference<DataContainer> typeReference = new TypeReference<>() {
         };
 
