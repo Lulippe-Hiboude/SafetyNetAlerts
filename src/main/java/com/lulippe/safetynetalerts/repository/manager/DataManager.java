@@ -1,14 +1,15 @@
 package com.lulippe.safetynetalerts.repository.manager;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.lulippe.safetynetalerts.dto.DataContainer;
-import com.lulippe.safetynetalerts.exception.DataLoadingException;
-import com.lulippe.safetynetalerts.exception.InvalidFileException;
+import com.lulippe.safetynetalerts.dao.DataContainer;
+import com.lulippe.safetynetalerts.exception.json_exception.DataLoadingException;
+import com.lulippe.safetynetalerts.exception.json_exception.InvalidFileException;
 import com.lulippe.safetynetalerts.utils.JsonUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
@@ -30,7 +31,8 @@ import java.nio.file.Paths;
 @Data
 @Component
 public class DataManager {
-    private static String FILE_PATH = "src/main/resources/json/data.json";
+    @Value("${data.file.path}")
+    private String filePath;
     private final Logger logger = LoggerFactory.getLogger(DataManager.class);
     private DataContainer dataContainer;
 
@@ -44,9 +46,9 @@ public class DataManager {
     }
 
     public DataContainer loadData() {
-        if (!Files.exists(Paths.get(FILE_PATH))) {
-            logger.error("the file {} does not exist", FILE_PATH);
-            throw new DataLoadingException("the file does not exist", new FileNotFoundException(FILE_PATH));
+        if (!Files.exists(Paths.get(filePath))) {
+            logger.error("the file {} does not exist", filePath);
+            throw new DataLoadingException("the file does not exist", new FileNotFoundException(filePath));
         }
         String json = getFile();
         return JsonUtil.fromJson(json, new TypeReference<>() {
@@ -55,7 +57,7 @@ public class DataManager {
 
     private String getFile() {
         try {
-            return new String(Files.readAllBytes(Paths.get(FILE_PATH)));
+            return new String(Files.readAllBytes(Paths.get(filePath)));
         } catch (IOException e) {
             throw new InvalidFileException(e.getMessage());
         }

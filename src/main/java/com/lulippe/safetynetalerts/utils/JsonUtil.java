@@ -1,17 +1,13 @@
 package com.lulippe.safetynetalerts.utils;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lulippe.safetynetalerts.exception.DataLoadingException;
+import com.lulippe.safetynetalerts.exception.json_exception.DataLoadingException;
 import com.lulippe.safetynetalerts.repository.manager.DataManager;
 import lombok.experimental.UtilityClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 /**
  * Utility class for JSON serialization and deserialization.
