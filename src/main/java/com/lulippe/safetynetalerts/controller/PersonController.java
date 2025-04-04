@@ -12,7 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import static com.lulippe.safetynetalerts.utils.LogUtil.logPersonNotFound;
 
 @Slf4j
 @RestController
@@ -42,10 +45,25 @@ public class PersonController implements PersonApi {
             personService.handlePersonUpdateRequest(personUpdateDto);
             return ResponseEntity.ok("Person update successfully : " + personUpdateDto);
         } catch (InexistantPersonException e) {
-            log.error("Person does not exist: {}", e.getMessage());
+            logPersonNotFound(personUpdateDto.getFirstName(), personUpdateDto.getLastName());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (InvalidPersonDataException e) {
             log.error("Person update failed: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> deletePerson(@RequestParam @Valid String firstName, @RequestParam @Valid String lastName) {
+        try {
+            log.info("Deleting person by firstName {} and  lastName {}", firstName, lastName);
+            personService.handlePersonDeleteRequest(firstName, lastName);
+            return ResponseEntity.ok("Person with firstName " + firstName + " and lastName " + lastName + ", delete successfully.");
+        } catch (InexistantPersonException e) {
+            logPersonNotFound(firstName, lastName);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (InvalidPersonDataException e) {
+            log.error("Person delete failed: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }

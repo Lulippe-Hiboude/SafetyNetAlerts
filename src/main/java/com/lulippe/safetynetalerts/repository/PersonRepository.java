@@ -16,20 +16,25 @@ public class PersonRepository {
     private DataManager dataManager;
 
     public Optional<Person> findPersonByFirstNameAndLastName(final String firstName, final String lastName) {
-        return dataManager.getDataContainer().getPersons().stream()
+        return getPersons().stream()
                 .filter(person -> person.getFirstName().equals(firstName) && person.getLastName().equals(lastName))
                 .findFirst();
     }
 
     public void savePerson(final Person person) {
-        List<Person> persons = dataManager.getDataContainer().getPersons();
         Optional<Person> existingPersonOptional = findPersonByFirstNameAndLastName(person.getFirstName(), person.getLastName());
         existingPersonOptional.ifPresentOrElse(existingPerson -> {
-                    int index = persons.indexOf(existingPerson);
-                    persons.set(index, person);
+                    int index = getPersons().indexOf(existingPerson);
+                    getPersons().set(index, person);
                 },
-                () -> persons.add(person));
+                () -> getPersons().add(person));
     }
 
+    public void deletePerson(final Person person) {
+        getPersons().remove(person);
+    }
 
+    private List<Person> getPersons() {
+        return dataManager.getDataContainer().getPersons();
+    }
 }

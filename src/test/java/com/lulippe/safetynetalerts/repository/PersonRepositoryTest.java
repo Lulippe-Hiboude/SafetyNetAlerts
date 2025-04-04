@@ -103,6 +103,25 @@ class PersonRepositoryTest {
 
     }
 
+    @Test
+    @DisplayName("should delete an existing person")
+    void shouldDeleteAnExistingPerson() {
+        //given
+        DataContainer dataContainer = initializeDataContainer();
+        given(dataManager.getDataContainer()).willReturn(dataContainer);
+        Person personToDelete = Person.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .email("john@doe.com")
+                .build();
+
+        //when
+        personRepository.deletePerson(personToDelete);
+
+        //then
+        assertEquals(0, dataContainer.getPersons().size());
+    }
+
     private DataContainer initializeDataContainer() {
         Person person = new Person();
         person.setFirstName("John");
@@ -114,6 +133,4 @@ class PersonRepositoryTest {
         dataContainer.setPersons(personList);
         return dataContainer;
     }
-
-
 }

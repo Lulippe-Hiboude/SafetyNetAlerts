@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -180,7 +179,7 @@ class PersonControllerTest {
     }
 
     @Test
-    @DisplayName("should 404 when person does not exist")
+    @DisplayName("should return 404 when person does not exist")
     void shouldReturnNotFoundWhenPersonDoesNotExist() throws Exception {
         //given
         PersonDto personUpdateDto = PersonDto.builder()
@@ -228,4 +227,57 @@ class PersonControllerTest {
                 .andExpect(content().string("Person update successfully : " + personUpdateDto));
     }
 
+    @Test
+    @DisplayName("should delete a Person and return 200 status")
+    void shouldDeletePerson() throws Exception {
+        //given
+        String firstName = "John";
+        String lastName = "Doe";
+        doNothing().when(personService).handlePersonDeleteRequest(firstName, lastName);
+
+        //when & then
+        mockMvc.perform(MockMvcRequestBuilders.delete("/person")
+                        .param("firstName", firstName)
+                        .param("lastName", lastName)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().string("Person with firstName " + firstName + " and lastName " + lastName + ", delete successfully."));
+    }
+
+    @Test
+    @DisplayName("should return 404 when person does not exist for deletion")
+    void shouldReturnNotFoundWhenPersonDoesNotExistForDeletion() throws Exception {
+        //given
+        String firstName = "John";
+        String lastName = "Doe";
+        doThrow(new InexistantPersonException("Person with firstName " + firstName + " and lastName " + lastName + " does not exist"))
+                .when(personService).handlePersonDeleteRequest(firstName, lastName);
+
+        //when & then
+        mockMvc.perform(MockMvcRequestBuilders.delete("/person")
+                        .param("firstName", firstName)
+                        .param("lastName", lastName)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Person with firstName " + firstName + " and lastName " + lastName + " does not exist"));
+    }
+
+    @Test
+    @DisplayName("should return 400 status when firstName or lastName is null for delete person")
+    void shouldReturnBadRequestWhenFirstNameOrLastNameIsBlankForDeletePerson() throws Exception {
+        //given
+        String firstName = "John";
+        String lastName = "  ";
+        doThrow(new InvalidPersonDataException("firstName or lastName is blank "))
+                .when(personService).handlePersonDeleteRequest(firstName, lastName);
+
+        //when & then
+        mockMvc.perform(MockMvcRequestBuilders.delete("/person")
+                        .param("firstName", firstName)
+                        .param("lastName", lastName)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("firstName or lastName is blank "));
+    }
 }

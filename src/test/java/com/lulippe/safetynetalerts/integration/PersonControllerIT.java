@@ -17,8 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -186,8 +185,8 @@ class PersonControllerIT {
 
         //when & then
         mockMvc.perform(put("/person")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(personUpdateDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(personUpdateDto)))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Person update successfully : " + personUpdateDto));
         DataContainer updatedData2 = dataManager.getDataContainer();
@@ -257,4 +256,68 @@ class PersonControllerIT {
                         + " and lastName: " + personUpdateDto.getLastName() + " does not exist"));
     }
 
+    @Test
+    @DisplayName("should delete a person and update dataContainer")
+    void shouldDeletePersonAndUpdateDataContainer() throws Exception {
+        //given
+        final String firstName = "Johnny";
+        final String lastName = "Boyd";
+        DataContainer initialDataContainer = dataManager.getDataContainer();
+        assertEquals(1, initialDataContainer.getPersons().size());
+        assertTrue(initialDataContainer.getPersons().stream()
+                .anyMatch(person -> person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)));
+
+        //when & then
+        mockMvc.perform(delete("/person")
+                        .param("firstName", firstName)
+                        .param("lastName", lastName)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Person with firstName " + firstName
+                        + " and lastName " + lastName + ", delete successfully."));
+        DataContainer updatedData = dataManager.getDataContainer();
+        assertEquals(0, updatedData.getPersons().size());
+    }
+
+    @Test
+    @DisplayName("should return 404 when person does not exist for deletion")
+    void shouldReturn404WhenPersonDoesNotExistForDeletion() throws Exception {
+        //given
+        final String firstName = "Jane";
+        final String lastName = "Doe";
+        DataContainer initialDataContainer = dataManager.getDataContainer();
+        assertEquals(1, initialDataContainer.getPersons().size());
+        assertFalse(initialDataContainer.getPersons().stream()
+                .anyMatch(person -> person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)));
+
+        //when & then
+        mockMvc.perform(delete("/person")
+                        .param("firstName", firstName)
+                        .param("lastName", lastName)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().string("Person with firstName " + firstName + " and lastName " + lastName + " does not exist"));
+        DataContainer updatedData = dataManager.getDataContainer();
+        assertEquals(1, updatedData.getPersons().size());
+    }
+
+    @Test
+    @DisplayName("should return 400 when lastName or firstName is blank for deletion")
+    void shouldReturn400WhenLastNameIsBlankForDeletion() throws Exception {
+        //given
+        final String firstName = "Jane";
+        final String lastName = " ";
+        DataContainer initialDataContainer = dataManager.getDataContainer();
+        assertEquals(1, initialDataContainer.getPersons().size());
+        assertFalse(initialDataContainer.getPersons().stream()
+                .anyMatch(person -> person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)));
+
+        //when & then
+        mockMvc.perform(delete("/person")
+                        .param("firstName", firstName)
+                        .param("lastName", lastName)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string("firstName or lastName is blank"));
+    }
 }
