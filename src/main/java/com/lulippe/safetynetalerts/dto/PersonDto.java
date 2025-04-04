@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class PersonCreateDto {
+public class PersonDto {
     @Valid
     private String firstName;
     @Valid

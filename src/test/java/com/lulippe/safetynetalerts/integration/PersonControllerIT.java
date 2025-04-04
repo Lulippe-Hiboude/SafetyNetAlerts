@@ -2,7 +2,8 @@ package com.lulippe.safetynetalerts.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lulippe.safetynetalerts.dao.DataContainer;
-import com.lulippe.safetynetalerts.dto.PersonCreateDto;
+import com.lulippe.safetynetalerts.dto.PersonDto;
+import com.lulippe.safetynetalerts.model.Person;
 import com.lulippe.safetynetalerts.repository.manager.DataManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +18,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -42,7 +44,7 @@ class PersonControllerIT {
     @DisplayName("should create a new person and update the dataContainer")
     void shouldCreateNewPersonAndUpdateDataContainer() throws Exception {
         //given
-        PersonCreateDto personCreateDto = PersonCreateDto.builder()
+        PersonDto personCreateDto = PersonDto.builder()
                 .firstName("Jane")
                 .lastName("Doe")
                 .address("10 rue des Lilas")
@@ -73,7 +75,7 @@ class PersonControllerIT {
     @DisplayName("should return 409 when person already exists")
     void shouldReturnConflictWhenPersonAlreadyExists() throws Exception {
         //given
-        PersonCreateDto personCreateDto = PersonCreateDto.builder()
+        PersonDto personCreateDto = PersonDto.builder()
                 .firstName("Johnny")
                 .lastName("Boyd")
                 .address("1509 Culver St")
@@ -102,7 +104,7 @@ class PersonControllerIT {
     @DisplayName("should return 400 when firstName or lastName is null")
     void shouldReturn400WhenFirstNameIsNull() throws Exception {
         //given
-        PersonCreateDto personCreateDto = PersonCreateDto.builder()
+        PersonDto personCreateDto = PersonDto.builder()
                 .firstName(null)
                 .lastName("Doe")
                 .address("45 rue de la Paix")
@@ -145,5 +147,114 @@ class PersonControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @DisplayName("should update a person and update dataContainer")
+    void shouldUpdatePersonAndUpdateDataContainer() throws Exception {
+        //given
+        PersonDto personCreateDto = PersonDto.builder()
+                .firstName("Jane")
+                .lastName("Doe")
+                .address("10 rue des Lilas")
+                .city("Paris")
+                .zip("75005")
+                .phone("0987654321")
+                .email("jane@doe.com")
+                .build();
+
+        PersonDto personUpdateDto =
+                PersonDto.builder()
+                        .firstName("Jane")
+                        .lastName("Doe")
+                        .city("Lyon")
+                        .zip("69498")
+                        .build();
+
+        DataContainer initialDataContainer = dataManager.getDataContainer();
+        assertEquals(1, initialDataContainer.getPersons().size());
+        assertFalse(initialDataContainer.getPersons().stream()
+                .anyMatch(person -> person.getFirstName().equals("Jane") && person.getLastName().equals("Doe")));
+
+        mockMvc.perform(post("/person")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(personCreateDto)))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Person create successfully : " + personCreateDto));
+        DataContainer updatedData = dataManager.getDataContainer();
+        assertEquals(2, updatedData.getPersons().size());
+        assertTrue(updatedData.getPersons().stream()
+                .anyMatch(person -> person.getFirstName().equals("Jane") && person.getLastName().equals("Doe")));
+
+        //when & then
+        mockMvc.perform(put("/person")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(personUpdateDto)))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Person update successfully : " + personUpdateDto));
+        DataContainer updatedData2 = dataManager.getDataContainer();
+        assertEquals(2, updatedData2.getPersons().size());
+
+        Person updatedPerson = updatedData2.getPersons().stream()
+                .filter(person -> person.getFirstName().equals("Jane") && person.getLastName().equals("Doe"))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(updatedPerson);
+        assertEquals(personUpdateDto.getZip(), updatedPerson.getZip());
+        assertEquals(personUpdateDto.getCity(), updatedPerson.getCity());
+    }
+
+    @Test
+    @DisplayName("should return 400 when firstName or lastName is null for updatePersonDto")
+    void shouldReturn400WhenFirstNameIsNullForUpdatePersonDto() throws Exception {
+        //given
+        PersonDto personUpdateDto = PersonDto.builder()
+                .firstName(null)
+                .lastName("Doe")
+                .address("45 rue de la Paix")
+                .city("Paris")
+                .zip("75001")
+                .phone("1234567890")
+                .email("john@doe.com")
+                .build();
+
+        DataContainer initialDataContainer = dataManager.getDataContainer();
+        assertEquals(1, initialDataContainer.getPersons().size());
+        assertTrue(initialDataContainer.getPersons().stream()
+                .anyMatch(person -> person.getFirstName().equals("Johnny") && person.getLastName().equals("Boyd")));
+
+        //when & then
+        mockMvc.perform(put("/person")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(personUpdateDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string("firstName or lastName is blank"));
+        DataContainer updatedData = dataManager.getDataContainer();
+        assertEquals(1, updatedData.getPersons().size());
+        assertTrue(updatedData.getPersons().stream()
+                .anyMatch(person -> person.getFirstName().equals("Johnny") && person.getLastName().equals("Boyd")));
+    }
+
+    @Test
+    @DisplayName("Should return 404 when person does not exist")
+    void shouldReturn404WhenPersonDoesNotExist() throws Exception {
+        PersonDto personUpdateDto =
+                PersonDto.builder()
+                        .firstName("Jane")
+                        .lastName("Doe")
+                        .city("Lyon")
+                        .zip("69498")
+                        .build();
+        DataContainer initialDataContainer = dataManager.getDataContainer();
+        assertEquals(1, initialDataContainer.getPersons().size());
+        assertTrue(initialDataContainer.getPersons().stream()
+                .anyMatch(person -> person.getFirstName().equals("Johnny") && person.getLastName().equals("Boyd")));
+
+        mockMvc.perform(put("/person")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(personUpdateDto)))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().string("the person with firstName: " + personUpdateDto.getFirstName()
+                        + " and lastName: " + personUpdateDto.getLastName() + " does not exist"));
+    }
 
 }

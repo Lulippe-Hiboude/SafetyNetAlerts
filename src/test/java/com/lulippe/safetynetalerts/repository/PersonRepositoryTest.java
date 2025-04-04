@@ -35,13 +35,13 @@ class PersonRepositoryTest {
         String lastName = "Doe";
         String email = "john@doe.com";
         //when
-        Optional<Person> expectedPerson = personRepository.getPersonByFirstNameAndLastName(firstName, lastName);
+        Optional<Person> expectedPerson = personRepository.findPersonByFirstNameAndLastName(firstName, lastName);
 
         //then
         assertTrue(expectedPerson.isPresent());
-        assertEquals(expectedPerson.get().getFirstName(), firstName);
-        assertEquals(expectedPerson.get().getLastName(), lastName);
-        assertEquals(expectedPerson.get().getEmail(), email);
+        assertEquals(firstName, expectedPerson.get().getFirstName());
+        assertEquals(lastName, expectedPerson.get().getLastName());
+        assertEquals(email, expectedPerson.get().getEmail());
     }
 
     @Test
@@ -58,8 +58,49 @@ class PersonRepositoryTest {
         given(dataManager.getDataContainer()).willReturn(dataContainer);
 
         //when
-        Optional<Person> expectedPerson = personRepository.getPersonByFirstNameAndLastName("Jane", "Doe");
+        Optional<Person> expectedPerson = personRepository.findPersonByFirstNameAndLastName("Jane", "Doe");
         assertTrue(expectedPerson.isEmpty());
+    }
+
+    @Test
+    @DisplayName("should save a new person")
+    void shouldSaveANewPerson() {
+        //given
+        DataContainer dataContainer = initializeDataContainer();
+        given(dataManager.getDataContainer()).willReturn(dataContainer);
+
+        Person newPerson = Person.builder()
+                .firstName("Jane")
+                .lastName("Doe").build();
+        //when
+        personRepository.savePerson(newPerson);
+
+        //then
+        assertEquals(2, dataContainer.getPersons().size());
+        assertTrue(dataContainer.getPersons().contains(newPerson));
+    }
+
+    @Test
+    @DisplayName("should update an existing person")
+    void shouldUpdateAnExistingPerson() {
+        //given
+        DataContainer dataContainer = initializeDataContainer();
+        given(dataManager.getDataContainer()).willReturn(dataContainer);
+
+        Person updatingPerson = Person.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .email("j@doe.com")
+                .build();
+
+        //when
+        personRepository.savePerson(updatingPerson);
+
+        //then
+        assertEquals(1, dataContainer.getPersons().size());
+        assertTrue(dataContainer.getPersons().contains(updatingPerson));
+        assertEquals(updatingPerson.getEmail(), dataContainer.getPersons().getFirst().getEmail());
+
     }
 
     private DataContainer initializeDataContainer() {
@@ -73,5 +114,6 @@ class PersonRepositoryTest {
         dataContainer.setPersons(personList);
         return dataContainer;
     }
+
 
 }

@@ -1,10 +1,14 @@
 package com.lulippe.safetynetalerts.dao;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lulippe.safetynetalerts.model.FireStation;
 import com.lulippe.safetynetalerts.model.MedicalRecord;
 import com.lulippe.safetynetalerts.model.Person;
 import com.lulippe.safetynetalerts.repository.manager.DataManager;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
