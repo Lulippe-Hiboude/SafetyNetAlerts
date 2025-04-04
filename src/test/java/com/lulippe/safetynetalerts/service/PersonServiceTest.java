@@ -17,7 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -54,7 +55,7 @@ class PersonServiceTest {
         personService.handlePersonCreationRequest(personCreateDto);
 
         //then
-        verify(personRepository,(times(1))).savePerson(personArgumentCaptor.capture());
+        verify(personRepository, (times(1))).savePerson(personArgumentCaptor.capture());
         Person personSaved = personArgumentCaptor.getValue();
         assertEquals("John", personSaved.getFirstName());
         assertEquals("Doe", personSaved.getLastName());
@@ -70,8 +71,8 @@ class PersonServiceTest {
     void shouldThrowInvalidPersonDataExceptionIfPersonCreateDTOIsNull() {
         //when & then
         assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonCreationRequest(null));
-        verify(personRepository,times(0)).findPersonByFirstNameAndLastName(any(),any());
-        verify(personRepository,(times(0))).savePerson(any());
+        verify(personRepository, times(0)).findPersonByFirstNameAndLastName(any(), any());
+        verify(personRepository, (times(0))).savePerson(any());
     }
 
     @Test
@@ -101,7 +102,7 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(PersonAlreadyExistsException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
-        verify(personRepository,times(0)).savePerson(any());
+        verify(personRepository, times(0)).savePerson(any());
     }
 
     @Test
@@ -120,7 +121,7 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
-        verify(personRepository,times(0)).savePerson(any());
+        verify(personRepository, times(0)).savePerson(any());
     }
 
     @Test
@@ -139,7 +140,7 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
-        verify(personRepository,times(0)).savePerson(any());
+        verify(personRepository, times(0)).savePerson(any());
     }
 
     @Test
@@ -158,7 +159,7 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
-        verify(personRepository,times(0)).savePerson(any());
+        verify(personRepository, times(0)).savePerson(any());
     }
 
     @Test
@@ -177,17 +178,8 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
-        verify(personRepository,times(0)).savePerson(any());
+        verify(personRepository, times(0)).savePerson(any());
     }
-
-
-    /*pour updateDto :
-    #1 cas ou personDto est null
-    #2 cas ou firstName ou lastName est vide
-    #3 cas ou firstName ou lastName est null
-    #4 cas ou person exist avec données valides ok
-    #5 cas ou la person n'existe pas ok
-     */
 
     @Test
     @DisplayName("should update a person if it exists")
@@ -219,7 +211,7 @@ class PersonServiceTest {
 
         //then
         assert existingPerson != null;
-        verify(personRepository,times(1)).savePerson(personArgumentCaptor.capture());
+        verify(personRepository, times(1)).savePerson(personArgumentCaptor.capture());
         Person updatedPerson = personArgumentCaptor.getValue();
         assertEquals(personUpdateDto.getFirstName(), updatedPerson.getFirstName());
         assertEquals(personUpdateDto.getLastName(), updatedPerson.getLastName());
@@ -247,7 +239,7 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InexistantPersonException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
-        verify(personRepository,times(0)).savePerson(any());
+        verify(personRepository, times(0)).savePerson(any());
     }
 
     @Test
@@ -264,8 +256,8 @@ class PersonServiceTest {
                 .build();
 
         //when & then
-        assertThrows(InvalidPersonDataException.class,() -> personService.handlePersonCreationRequest(personUpdateDto));
-        verify(personRepository,times(0)).savePerson(any());
+        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
+        verify(personRepository, times(0)).savePerson(any());
     }
 
     @Test
@@ -282,8 +274,8 @@ class PersonServiceTest {
                 .build();
 
         //when & then
-        assertThrows(InvalidPersonDataException.class,() -> personService.handlePersonCreationRequest(personUpdateDto));
-        verify(personRepository,times(0)).savePerson(any());
+        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
+        verify(personRepository, times(0)).savePerson(any());
     }
 
     @Test
@@ -300,8 +292,8 @@ class PersonServiceTest {
                 .build();
 
         //when & then
-        assertThrows(InvalidPersonDataException.class,() -> personService.handlePersonCreationRequest(personUpdateDto));
-        verify(personRepository,times(0)).savePerson(any());
+        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
+        verify(personRepository, times(0)).savePerson(any());
     }
 
     @Test
@@ -318,10 +310,7 @@ class PersonServiceTest {
                 .build();
 
         //when & then
-        assertThrows(InvalidPersonDataException.class,() -> personService.handlePersonCreationRequest(personUpdateDto));
-        verify(personRepository,times(0)).savePerson(any());
+        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
+        verify(personRepository, times(0)).savePerson(any());
     }
-
-
-
 }
