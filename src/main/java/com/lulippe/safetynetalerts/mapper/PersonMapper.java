@@ -1,11 +1,8 @@
 package com.lulippe.safetynetalerts.mapper;
 
-import com.lulippe.safetynetalerts.dto.PersonCreateDto;
+import com.lulippe.safetynetalerts.dto.PersonDto;
 import com.lulippe.safetynetalerts.model.Person;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -21,5 +18,13 @@ public interface PersonMapper {
     @Mapping(target = "zip", source = "zip")
     @Mapping(target = "phone", source = "phone")
     @Mapping(target = "email", source = "email")
-    Person ToPerson(final PersonCreateDto personCreateDto);
+    Person ToPerson(final PersonDto personCreateDto);
+
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "address", source = "address")
+    @Mapping(target = "city", source = "city")
+    @Mapping(target = "zip", source = "zip")
+    @Mapping(target = "phone", source = "phone")
+    @Mapping(target = "email", source = "email")
+    Person ToPerson(final String address, final String city, final String zip, final String phone, final String email, @MappingTarget final Person existingPerson);
 }

@@ -24,9 +24,9 @@ public class JsonUtil {
     /**
      * Converts a JSON string into a Java object of the specified type.
      *
-     * @param json the JSON string to convert
+     * @param json          the JSON string to convert
      * @param typeReference the target object type
-     * @param <T> the generic type of the object
+     * @param <T>           the generic type of the object
      * @return the deserialized object
      * @throws DataLoadingException if a parsing error occurs
      */

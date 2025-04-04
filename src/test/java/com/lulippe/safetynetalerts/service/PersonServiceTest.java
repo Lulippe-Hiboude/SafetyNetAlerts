@@ -1,6 +1,7 @@
 package com.lulippe.safetynetalerts.service;
 
-import com.lulippe.safetynetalerts.dto.PersonCreateDto;
+import com.lulippe.safetynetalerts.dto.PersonDto;
+import com.lulippe.safetynetalerts.exception.person_exception.InexistantPersonException;
 import com.lulippe.safetynetalerts.exception.person_exception.InvalidPersonDataException;
 import com.lulippe.safetynetalerts.exception.person_exception.PersonAlreadyExistsException;
 import com.lulippe.safetynetalerts.model.Person;
@@ -16,8 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -38,7 +38,7 @@ class PersonServiceTest {
     @DisplayName("should create a person")
     void shouldCreatePerson() {
         //given
-        PersonCreateDto personCreateDto = PersonCreateDto.builder()
+        PersonDto personCreateDto = PersonDto.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .address("45 rue de la Paix")
@@ -48,7 +48,7 @@ class PersonServiceTest {
                 .email("john@doe.com")
                 .build();
 
-        given(personRepository.getPersonByFirstNameAndLastName(personCreateDto.getFirstName(), personCreateDto.getLastName())).willReturn(Optional.empty());
+        given(personRepository.findPersonByFirstNameAndLastName(personCreateDto.getFirstName(), personCreateDto.getLastName())).willReturn(Optional.empty());
 
         //when
         personService.handlePersonCreationRequest(personCreateDto);
@@ -70,15 +70,15 @@ class PersonServiceTest {
     void shouldThrowInvalidPersonDataExceptionIfPersonCreateDTOIsNull() {
         //when & then
         assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonCreationRequest(null));
-        verify(personRepository,times(0)).getPersonByFirstNameAndLastName(any(),any());
+        verify(personRepository,times(0)).findPersonByFirstNameAndLastName(any(),any());
         verify(personRepository,(times(0))).savePerson(any());
     }
 
     @Test
     @DisplayName("should throw PersonAlreadyExistsException if person already exists")
-    void shouldReturnNullIfPersonAlreadyExists() {
+    void shouldThrowPersonAlreadyExistsExceptionIfPersonAlreadyExists() {
         //given
-        PersonCreateDto personCreateDto = PersonCreateDto.builder()
+        PersonDto personCreateDto = PersonDto.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .address("45 rue de la Paix")
@@ -97,7 +97,7 @@ class PersonServiceTest {
                 .phone("1234567890")
                 .email("john@doe.com")
                 .build();
-        given(personRepository.getPersonByFirstNameAndLastName(personCreateDto.getFirstName(), personCreateDto.getLastName())).willReturn(Optional.ofNullable(existingPerson));
+        given(personRepository.findPersonByFirstNameAndLastName(personCreateDto.getFirstName(), personCreateDto.getLastName())).willReturn(Optional.ofNullable(existingPerson));
 
         //when & then
         assertThrows(PersonAlreadyExistsException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
@@ -108,7 +108,7 @@ class PersonServiceTest {
     @DisplayName("Should throw InvalidPersonDataException if firstName is null")
     void shouldThrowInvalidPersonDataExceptionIfFirstNameIsNull() {
         //given
-        PersonCreateDto personCreateDto = PersonCreateDto.builder()
+        PersonDto personCreateDto = PersonDto.builder()
                 .firstName(null)
                 .lastName("Doe")
                 .address("45 rue de la Paix")
@@ -127,7 +127,7 @@ class PersonServiceTest {
     @DisplayName("Should throw InvalidPersonDataException if lastName is null")
     void shouldThrowInvalidPersonDataExceptionIfLastNameIsNull() {
         //given
-        PersonCreateDto personCreateDto = PersonCreateDto.builder()
+        PersonDto personCreateDto = PersonDto.builder()
                 .firstName("John")
                 .lastName(null)
                 .address("45 rue de la Paix")
@@ -146,7 +146,7 @@ class PersonServiceTest {
     @DisplayName("Should throw InvalidPersonDataException if firstName is empty")
     void shouldThrowInvalidPersonDataExceptionIfFirstNameIsEmpty() {
         //given
-        PersonCreateDto personCreateDto = PersonCreateDto.builder()
+        PersonDto personCreateDto = PersonDto.builder()
                 .firstName("  ")
                 .lastName("Doe")
                 .address("45 rue de la Paix")
@@ -165,7 +165,7 @@ class PersonServiceTest {
     @DisplayName("Should throw InvalidPersonDataException if lastName is empty")
     void shouldThrowInvalidPersonDataExceptionIfLastNameIsEmpty() {
         //given
-        PersonCreateDto personCreateDto = PersonCreateDto.builder()
+        PersonDto personCreateDto = PersonDto.builder()
                 .firstName("John")
                 .lastName("  ")
                 .address("45 rue de la Paix")
@@ -179,4 +179,149 @@ class PersonServiceTest {
         assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
         verify(personRepository,times(0)).savePerson(any());
     }
+
+
+    /*pour updateDto :
+    #1 cas ou personDto est null
+    #2 cas ou firstName ou lastName est vide
+    #3 cas ou firstName ou lastName est null
+    #4 cas ou person exist avec données valides ok
+    #5 cas ou la person n'existe pas ok
+     */
+
+    @Test
+    @DisplayName("should update a person if it exists")
+    void shouldUpdatePersonIfItExists() {
+        //given
+        PersonDto personUpdateDto = PersonDto.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .address("75 rue de la Gare")
+                .city("Lyon")
+                .zip("69001")
+                .phone(null)
+                .email(null)
+                .build();
+
+        Person existingPerson = Person.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .address("45 rue de la Paix")
+                .city("Paris")
+                .zip("75001")
+                .phone("1234567890")
+                .email("john@doe.com")
+                .build();
+        given(personRepository.findPersonByFirstNameAndLastName(personUpdateDto.getFirstName(), personUpdateDto.getLastName())).willReturn(Optional.ofNullable(existingPerson));
+
+        //when
+        personService.handlePersonUpdateRequest(personUpdateDto);
+
+        //then
+        assert existingPerson != null;
+        verify(personRepository,times(1)).savePerson(personArgumentCaptor.capture());
+        Person updatedPerson = personArgumentCaptor.getValue();
+        assertEquals(personUpdateDto.getFirstName(), updatedPerson.getFirstName());
+        assertEquals(personUpdateDto.getLastName(), updatedPerson.getLastName());
+        assertEquals(personUpdateDto.getAddress(), updatedPerson.getAddress());
+        assertEquals(personUpdateDto.getCity(), updatedPerson.getCity());
+        assertEquals(personUpdateDto.getZip(), updatedPerson.getZip());
+        assertEquals(existingPerson.getPhone(), updatedPerson.getPhone());
+        assertEquals(existingPerson.getEmail(), updatedPerson.getEmail());
+    }
+
+    @Test
+    @DisplayName("should throw InexistantPersonException if the person does not exist")
+    void shouldThrowInexistantPersonExceptionIfThePersonDoesNotExist() {
+        //given
+        PersonDto personUpdateDto = PersonDto.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .address("75 rue de la Gare")
+                .city("Lyon")
+                .zip("69001")
+                .phone(null)
+                .email(null)
+                .build();
+        given(personRepository.findPersonByFirstNameAndLastName(personUpdateDto.getFirstName(), personUpdateDto.getLastName())).willReturn(Optional.empty());
+
+        //when & then
+        assertThrows(InexistantPersonException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
+        verify(personRepository,times(0)).savePerson(any());
+    }
+
+    @Test
+    @DisplayName("should throw InvalidPersonException if firstName is null ")
+    void shouldThrowInvalidPersonExceptionIfFirstNameIsNull() {
+        PersonDto personUpdateDto = PersonDto.builder()
+                .firstName(null)
+                .lastName("Doe")
+                .address("75 rue de la Gare")
+                .city("Lyon")
+                .zip("69001")
+                .phone(null)
+                .email(null)
+                .build();
+
+        //when & then
+        assertThrows(InvalidPersonDataException.class,() -> personService.handlePersonCreationRequest(personUpdateDto));
+        verify(personRepository,times(0)).savePerson(any());
+    }
+
+    @Test
+    @DisplayName("should throw InvalidPersonException if firstName is null ")
+    void shouldThrowInvalidPersonExceptionIfLastNameIsNull() {
+        PersonDto personUpdateDto = PersonDto.builder()
+                .firstName("John")
+                .lastName(null)
+                .address("75 rue de la Gare")
+                .city("Lyon")
+                .zip("69001")
+                .phone(null)
+                .email(null)
+                .build();
+
+        //when & then
+        assertThrows(InvalidPersonDataException.class,() -> personService.handlePersonCreationRequest(personUpdateDto));
+        verify(personRepository,times(0)).savePerson(any());
+    }
+
+    @Test
+    @DisplayName("should throw InvalidPersonException if firstName is blank ")
+    void shouldThrowInvalidPersonExceptionIfFirstNameIsBlank() {
+        PersonDto personUpdateDto = PersonDto.builder()
+                .firstName("  ")
+                .lastName("Doe")
+                .address("75 rue de la Gare")
+                .city("Lyon")
+                .zip("69001")
+                .phone(null)
+                .email(null)
+                .build();
+
+        //when & then
+        assertThrows(InvalidPersonDataException.class,() -> personService.handlePersonCreationRequest(personUpdateDto));
+        verify(personRepository,times(0)).savePerson(any());
+    }
+
+    @Test
+    @DisplayName("should throw InvalidPersonException if lastName is blank ")
+    void shouldThrowInvalidPersonExceptionIfLastNameIsBlank() {
+        PersonDto personUpdateDto = PersonDto.builder()
+                .firstName("John")
+                .lastName("  ")
+                .address("75 rue de la Gare")
+                .city("Lyon")
+                .zip("69001")
+                .phone(null)
+                .email(null)
+                .build();
+
+        //when & then
+        assertThrows(InvalidPersonDataException.class,() -> personService.handlePersonCreationRequest(personUpdateDto));
+        verify(personRepository,times(0)).savePerson(any());
+    }
+
+
+
 }

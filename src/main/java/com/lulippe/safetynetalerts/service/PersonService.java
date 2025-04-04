@@ -1,6 +1,7 @@
 package com.lulippe.safetynetalerts.service;
 
-import com.lulippe.safetynetalerts.dto.PersonCreateDto;
+import com.lulippe.safetynetalerts.dto.PersonDto;
+import com.lulippe.safetynetalerts.exception.person_exception.InexistantPersonException;
 import com.lulippe.safetynetalerts.exception.person_exception.InvalidPersonDataException;
 import com.lulippe.safetynetalerts.exception.person_exception.PersonAlreadyExistsException;
 import com.lulippe.safetynetalerts.mapper.PersonMapper;
@@ -22,29 +23,55 @@ import java.util.Optional;
 public class PersonService {
     private final PersonRepository personRepository;
 
-    public void handlePersonCreationRequest(PersonCreateDto personCreateDto) {
-        validatePersonCreateDto(personCreateDto);
+    public void handlePersonCreationRequest(PersonDto personCreateDto) {
+        validatePersonDto(personCreateDto);
         if (isPersonExist(personCreateDto.getFirstName(), personCreateDto.getLastName())) {
-            log.info("Person already exists with first name {} and last name {}", personCreateDto.getFirstName(), personCreateDto.getLastName());
+            log.error("Person already exists with first name {} and last name {}", personCreateDto.getFirstName(), personCreateDto.getLastName());
             throw new PersonAlreadyExistsException("Person already exists");
         }
         createPerson(personCreateDto);
     }
 
-    private void createPerson(PersonCreateDto personCreateDto) {
+    public void handlePersonUpdateRequest(PersonDto personUpdateDto) {
+        validatePersonDto(personUpdateDto);
+        updatePerson(personUpdateDto);
+    }
+
+    private void updatePerson(PersonDto personUpdateDto) {
+        personRepository.findPersonByFirstNameAndLastName(personUpdateDto.getFirstName(), personUpdateDto.getLastName())
+                .ifPresentOrElse(existingPerson -> {
+                            PersonMapper.INSTANCE.ToPerson(personUpdateDto.getAddress(),personUpdateDto.getCity(),
+                                    personUpdateDto.getZip(),personUpdateDto.getPhone(),
+                                    personUpdateDto.getEmail(), existingPerson);
+                            personRepository.savePerson(existingPerson);
+                            log.info("Person with firstName {} and lastName {} has been successfully updated", existingPerson.getFirstName(), existingPerson.getLastName());
+                        },
+                        () -> {
+                            log.error("Person with firstName {} and lastName {} does not exists", personUpdateDto.getFirstName(), personUpdateDto.getLastName());
+                            throw new InexistantPersonException("the person with firstName: " + personUpdateDto.getFirstName() + " and lastName: " + personUpdateDto.getLastName() + " does not exist");
+                        }
+                );
+    }
+
+    private void createPerson(PersonDto personCreateDto) {
         Person newPerson = PersonMapper.INSTANCE.ToPerson(personCreateDto);
         personRepository.savePerson(newPerson);
         log.info("New person created: {}", newPerson);
+
     }
 
     private Boolean isPersonExist(String firstName, String lastName) {
-        return personRepository.getPersonByFirstNameAndLastName(firstName, lastName).isPresent();
+        return personRepository.findPersonByFirstNameAndLastName(firstName, lastName).isPresent();
     }
 
-    private void validatePersonCreateDto(PersonCreateDto personCreateDto) {
-        Optional.ofNullable(personCreateDto).orElseThrow(() -> new InvalidPersonDataException("personCreateDto is null"));
+    private void validatePersonDto(PersonDto personDto) {
+        Optional.ofNullable(personDto).orElseThrow(() -> {
+            log.error("personDto is null");
+            return new InvalidPersonDataException("personDto is null");
+        });
 
-        if (Strings.isBlank(personCreateDto.getFirstName()) || Strings.isBlank(personCreateDto.getLastName())) {
+        if (Strings.isBlank(personDto.getFirstName()) || Strings.isBlank(personDto.getLastName())) {
+            log.error("firstName or lastName is blank");
             throw new InvalidPersonDataException("firstName or lastName is blank");
         }
     }
