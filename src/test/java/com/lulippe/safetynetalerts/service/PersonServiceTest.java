@@ -313,4 +313,69 @@ class PersonServiceTest {
         assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
         verify(personRepository, times(0)).savePerson(any());
     }
+
+    @Test
+    @DisplayName("should delete a person")
+    void shouldDeletePerson() {
+        //given
+        final String firstName = "John";
+        final String lastName = "Doe";
+        Person existingPerson = Person.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .address("45 rue de la Paix")
+                .city("Paris")
+                .zip("75001")
+                .phone("1234567890")
+                .email("john@doe.com")
+                .build();
+        given(personRepository.findPersonByFirstNameAndLastName(firstName, lastName)).willReturn(Optional.ofNullable(existingPerson));
+
+
+        //when
+        personService.handlePersonDeleteRequest(firstName, lastName);
+
+        //then
+        verify(personRepository, times(1)).deletePerson(personArgumentCaptor.capture());
+        Person deletedPerson = personArgumentCaptor.getValue();
+        assertEquals(firstName, deletedPerson.getFirstName());
+        assertEquals(lastName, deletedPerson.getLastName());
+    }
+
+    @Test
+    @DisplayName("should throw InexistantPersonException if person does not exist so cannot be deleted")
+    void shouldThrowInexistantPersonExceptionIfPersonDoesNotExist() {
+        //given
+        final String firstName = "John";
+        final String lastName = "Doe";
+        given(personRepository.findPersonByFirstNameAndLastName(firstName, lastName)).willReturn(Optional.empty());
+
+        //when & then
+        assertThrows(InexistantPersonException.class, () -> personService.handlePersonDeleteRequest(firstName, lastName));
+        verify(personRepository, times(0)).deletePerson(any());
+    }
+
+    @Test
+    @DisplayName("should throw InvalidPersonDataException if the lastName or firstName is null for delete a person")
+    void shouldThrowInvalidPersonDataExceptionIfLastNameOrFirstNameIsNull() {
+        //given
+        final String firstName = "John";
+        final String lastName = null;
+
+        //when & then
+        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonDeleteRequest(firstName, lastName));
+        verify(personRepository, times(0)).deletePerson(any());
+    }
+
+    @Test
+    @DisplayName("should throw InvalidPersonDataException if the lastName or firstName is blank for delete a person")
+    void shouldThrowInvalidPersonDataExceptionIfLastNameOrFirstNameIsBlank() {
+        //given
+        final String firstName = "John";
+        final String lastName = " ";
+
+        //when & then
+        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonDeleteRequest(firstName, lastName));
+        verify(personRepository, times(0)).deletePerson(any());
+    }
 }
