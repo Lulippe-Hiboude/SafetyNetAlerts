@@ -1,0 +1,18 @@
+package com.lulippe.safetynetalerts.utils;
+
+import com.lulippe.safetynetalerts.exception.person_exception.InvalidDataException;
+import lombok.experimental.UtilityClass;
+import org.apache.logging.log4j.util.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@UtilityClass
+public class ValidationUtil {
+    private static final Logger log = LoggerFactory.getLogger(ValidationUtil.class);
+    public static void validateLastNameAndFirstName(final String firstName, final String lastName) {
+        if (Strings.isBlank(firstName) || Strings.isBlank(lastName)) {
+            log.error("Invalid data: firstName or lastName is blank. firstName: '{}', lastName: '{}'", firstName, lastName);
+            throw new InvalidDataException("firstName or LastName is blank: " + firstName + ", " + lastName);
+        }
+    }
+}

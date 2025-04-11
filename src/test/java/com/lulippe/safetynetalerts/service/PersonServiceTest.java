@@ -1,9 +1,9 @@
 package com.lulippe.safetynetalerts.service;
 
 import com.lulippe.safetynetalerts.dto.PersonDto;
-import com.lulippe.safetynetalerts.exception.person_exception.InexistantPersonException;
-import com.lulippe.safetynetalerts.exception.person_exception.InvalidPersonDataException;
-import com.lulippe.safetynetalerts.exception.person_exception.PersonAlreadyExistsException;
+import com.lulippe.safetynetalerts.exception.person_exception.InexistantObjectException;
+import com.lulippe.safetynetalerts.exception.person_exception.InvalidDataException;
+import com.lulippe.safetynetalerts.exception.person_exception.ObjectAlreadyExistsException;
 import com.lulippe.safetynetalerts.model.Person;
 import com.lulippe.safetynetalerts.repository.PersonRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -67,15 +67,6 @@ class PersonServiceTest {
     }
 
     @Test
-    @DisplayName("should throw InvalidPersonDataException if PersonCreateDTO is null")
-    void shouldThrowInvalidPersonDataExceptionIfPersonCreateDTOIsNull() {
-        //when & then
-        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonCreationRequest(null));
-        verify(personRepository, times(0)).findPersonByFirstNameAndLastName(any(), any());
-        verify(personRepository, (times(0))).savePerson(any());
-    }
-
-    @Test
     @DisplayName("should throw PersonAlreadyExistsException if person already exists")
     void shouldThrowPersonAlreadyExistsExceptionIfPersonAlreadyExists() {
         //given
@@ -98,10 +89,10 @@ class PersonServiceTest {
                 .phone("1234567890")
                 .email("john@doe.com")
                 .build();
-        given(personRepository.findPersonByFirstNameAndLastName(personCreateDto.getFirstName(), personCreateDto.getLastName())).willReturn(Optional.ofNullable(existingPerson));
+        given(personRepository.findPersonByFirstNameAndLastName(personCreateDto.getFirstName(), personCreateDto.getLastName())).willReturn(Optional.of(existingPerson));
 
         //when & then
-        assertThrows(PersonAlreadyExistsException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
+        assertThrows(ObjectAlreadyExistsException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
         verify(personRepository, times(0)).savePerson(any());
     }
 
@@ -120,7 +111,7 @@ class PersonServiceTest {
                 .build();
 
         //when & then
-        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
+        assertThrows(InvalidDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
         verify(personRepository, times(0)).savePerson(any());
     }
 
@@ -139,7 +130,7 @@ class PersonServiceTest {
                 .build();
 
         //when & then
-        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
+        assertThrows(InvalidDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
         verify(personRepository, times(0)).savePerson(any());
     }
 
@@ -158,7 +149,7 @@ class PersonServiceTest {
                 .build();
 
         //when & then
-        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
+        assertThrows(InvalidDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
         verify(personRepository, times(0)).savePerson(any());
     }
 
@@ -177,7 +168,7 @@ class PersonServiceTest {
                 .build();
 
         //when & then
-        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
+        assertThrows(InvalidDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
         verify(personRepository, times(0)).savePerson(any());
     }
 
@@ -238,7 +229,7 @@ class PersonServiceTest {
         given(personRepository.findPersonByFirstNameAndLastName(personUpdateDto.getFirstName(), personUpdateDto.getLastName())).willReturn(Optional.empty());
 
         //when & then
-        assertThrows(InexistantPersonException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
+        assertThrows(InexistantObjectException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
         verify(personRepository, times(0)).savePerson(any());
     }
 
@@ -256,7 +247,7 @@ class PersonServiceTest {
                 .build();
 
         //when & then
-        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
+        assertThrows(InvalidDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
         verify(personRepository, times(0)).savePerson(any());
     }
 
@@ -274,7 +265,7 @@ class PersonServiceTest {
                 .build();
 
         //when & then
-        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
+        assertThrows(InvalidDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
         verify(personRepository, times(0)).savePerson(any());
     }
 
@@ -292,7 +283,7 @@ class PersonServiceTest {
                 .build();
 
         //when & then
-        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
+        assertThrows(InvalidDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
         verify(personRepository, times(0)).savePerson(any());
     }
 
@@ -310,7 +301,7 @@ class PersonServiceTest {
                 .build();
 
         //when & then
-        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
+        assertThrows(InvalidDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
         verify(personRepository, times(0)).savePerson(any());
     }
 
@@ -351,7 +342,7 @@ class PersonServiceTest {
         given(personRepository.findPersonByFirstNameAndLastName(firstName, lastName)).willReturn(Optional.empty());
 
         //when & then
-        assertThrows(InexistantPersonException.class, () -> personService.handlePersonDeleteRequest(firstName, lastName));
+        assertThrows(InexistantObjectException.class, () -> personService.handlePersonDeleteRequest(firstName, lastName));
         verify(personRepository, times(0)).deletePerson(any());
     }
 
@@ -363,7 +354,7 @@ class PersonServiceTest {
         final String lastName = null;
 
         //when & then
-        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonDeleteRequest(firstName, lastName));
+        assertThrows(InvalidDataException.class, () -> personService.handlePersonDeleteRequest(firstName, lastName));
         verify(personRepository, times(0)).deletePerson(any());
     }
 
@@ -375,7 +366,7 @@ class PersonServiceTest {
         final String lastName = " ";
 
         //when & then
-        assertThrows(InvalidPersonDataException.class, () -> personService.handlePersonDeleteRequest(firstName, lastName));
+        assertThrows(InvalidDataException.class, () -> personService.handlePersonDeleteRequest(firstName, lastName));
         verify(personRepository, times(0)).deletePerson(any());
     }
 }

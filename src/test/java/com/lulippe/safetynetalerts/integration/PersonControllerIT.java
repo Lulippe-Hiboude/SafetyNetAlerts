@@ -88,6 +88,7 @@ class PersonControllerIT {
         assertTrue(initialDataContainer.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals("Johnny") && person.getLastName().equals("Boyd")));
 
+        //when & then
         mockMvc.perform(post("/person")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(personCreateDto)))
@@ -123,7 +124,7 @@ class PersonControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(personCreateDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("firstName or lastName is blank"));
+                .andExpect(MockMvcResultMatchers.content().string("firstName or LastName is blank: " + personCreateDto.getFirstName() + ", " + personCreateDto.getLastName()));
         DataContainer updatedData = dataManager.getDataContainer();
         assertEquals(1, updatedData.getPersons().size());
         assertTrue(updatedData.getPersons().stream()
@@ -226,7 +227,7 @@ class PersonControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(personUpdateDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("firstName or lastName is blank"));
+                .andExpect(MockMvcResultMatchers.content().string("firstName or LastName is blank: " + personUpdateDto.getFirstName() + ", " + personUpdateDto.getLastName()));
         DataContainer updatedData = dataManager.getDataContainer();
         assertEquals(1, updatedData.getPersons().size());
         assertTrue(updatedData.getPersons().stream()
@@ -318,6 +319,6 @@ class PersonControllerIT {
                         .param("lastName", lastName)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("firstName or lastName is blank"));
+                .andExpect(MockMvcResultMatchers.content().string("firstName or LastName is blank: " + lastName +", " +firstName  ));
     }
 }
