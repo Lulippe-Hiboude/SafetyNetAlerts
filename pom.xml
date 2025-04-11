@@ -40,6 +40,8 @@
         <mapstruct.version>1.6.0</mapstruct.version>
         <jackson.version>2.17.2</jackson.version>
         <jacoco.version>0.8.12</jacoco.version>
+        <openapi-generator-plugin.version>7.8.0</openapi-generator-plugin.version>
+        <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
     </properties>
 
     <!-- ======================================================== -->
@@ -142,6 +144,17 @@
             <artifactId>jakarta.el</artifactId>
             <version>4.0.2</version>
         </dependency>
+        <!--OpenApi-->
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>openapi-generator</artifactId>
+            <version>${openapi-generator-plugin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>${jackson-databind-nullable.version}</version>
+        </dependency>
     </dependencies>
 
     <!-- ======================================================== -->
@@ -222,6 +235,39 @@
                             <goal>report</goal>
                         </goals>
                         <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${openapi-generator-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>medicalRecordDto</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/safety-net-alerts-medical-records-api.yaml</inputSpec>
+                            <apiPackage>com.lulippe.safetynetalerts.medicalRecord.api</apiPackage>
+                            <modelPackage>com.lulippe.safetynetalerts.medicalRecord.model</modelPackage>
+                            <generatorName>spring</generatorName>
+                            <generateModelTests>false</generateModelTests>
+                            <generateModelDocumentation>false</generateModelDocumentation>
+                            <generateApiTests>false</generateApiTests>
+                            <generateSupportingFiles>true</generateSupportingFiles>
+                            <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+                            <configOptions>
+                                <useTags>true</useTags>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <interfaceOnly>true</interfaceOnly>
+                            </configOptions>
+                            <additionalProperties>
+                                <additionalProperty>removeEnumValuePrefix=false</additionalProperty>
+                            </additionalProperties>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -1,0 +1,68 @@
+openapi: 3.0.3
+info:
+  title: SafetyNetAlerts MedicalRecords api
+  description: SafetyNetAlerts MedicalRecords api
+  version: 1.0.0
+servers:
+  - url: "/"
+    description: "Current"
+  - url: "http://localhost:8080"
+    description: "localhost"
+tags:
+  - name: "MedicalRecords"
+    description: "Everything for SafetyNetAlerts about the medical records"
+paths:
+  /medicalRecord:
+    post:
+      tags:
+        - "MedicalRecords"
+      summary: "Create a new medicalRecord"
+      operationId: "createNewMedicalRecord"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicalRecordDto'
+      responses:
+        '200':
+          description: "OK!"
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: "Invalid input"
+        '409':
+          description: "the medicalRecord for this person already exists"
+components:
+  schemas:
+    MedicalRecordDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: "the firstName of the owner of the medicalRecord"
+        lastName:
+          type: string
+          description: "the lastName of the owner of the medicalRecord"
+        birthdate:
+          type: string
+          description: "the birthdate of the owner of the medicalRecord"
+        medications:
+          type: array
+          description: "the list of all the treatments taken by the patient and their dosage"
+          items:
+            type: string
+            description: "the name and the prescribed dose of the medicine"
+            example: "aznol:350mg"
+        allergies:
+          type: array
+          description: "the list of all allergies the patient suffers from"
+          items:
+            type: string
+            description: "the name of the allergen"
+            example: "nillacilan"
+
+
+  
