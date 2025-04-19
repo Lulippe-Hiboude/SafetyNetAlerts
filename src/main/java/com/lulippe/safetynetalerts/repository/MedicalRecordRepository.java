@@ -12,27 +12,21 @@ import java.util.Optional;
 @Data
 @Repository
 @AllArgsConstructor
-public class MedicalRecordRepository {
+public class MedicalRecordRepository extends AbstractCrudRepository<MedicalRecord> {
     private final DataManager dataManager;
 
-    private List<MedicalRecord> getMedicalRecords() {
+    @Override
+    protected List<MedicalRecord> getDataList() {
         return dataManager.getDataContainer().getMedicalRecords();
     }
 
-    ;
-
-    public Optional<MedicalRecord> findMedicalRecordByFirstNameAndLastName(final String firstName, final String lastName) {
-        return getMedicalRecords().stream()
-                .filter(medicalRecord -> medicalRecord.getFirstName().equals(firstName) && medicalRecord.getLastName().equals(lastName))
-                .findFirst();
+    @Override
+    protected String getFirstName(MedicalRecord entity) {
+        return entity.getFirstName();
     }
 
-    public void saveMedicalRecord(final MedicalRecord medicalRecord) {
-        Optional<MedicalRecord> optionalMedicalRecord = findMedicalRecordByFirstNameAndLastName(medicalRecord.getFirstName(), medicalRecord.getLastName());
-        optionalMedicalRecord.ifPresentOrElse(existingMedicalRecord -> {
-                    int index = getMedicalRecords().indexOf(existingMedicalRecord);
-                    getMedicalRecords().set(index, medicalRecord);
-                },
-                () -> getMedicalRecords().add(medicalRecord));
+    @Override
+    protected String getLastName(MedicalRecord entity) {
+        return entity.getLastName();
     }
 }

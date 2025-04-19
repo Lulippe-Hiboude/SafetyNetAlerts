@@ -1,6 +1,6 @@
 package com.lulippe.safetynetalerts.utils;
 
-import com.lulippe.safetynetalerts.exception.person_exception.InvalidDataException;
+import com.lulippe.safetynetalerts.exception.entity_exception.InvalidDataException;
 import lombok.experimental.UtilityClass;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;

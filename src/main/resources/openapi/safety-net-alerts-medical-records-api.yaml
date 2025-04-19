@@ -35,6 +35,61 @@ paths:
           description: "Invalid input"
         '409':
           description: "the medicalRecord for this person already exists"
+    put:
+      tags:
+        - "MedicalRecords"
+      summary: "Update a existing medicalRecord"
+      operationId: "updateMedicalRecord"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicalRecordUpdateDto'
+      responses:
+        '200':
+          description: "OK!"
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: "Invalid input"
+        '404':
+          description: "the medicalRecord for this person does not exist 
+          or the medication or the allergy does not exist for remove or update operation"
+        '409':
+          description: "the medication or the allergy already exists for add operation"
+    delete:
+      tags:
+        - "MedicalRecords"
+      summary: "delete an existing medical record"
+      operationId: "deleteMedicalRecord"
+      parameters:
+        - name: firstName
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "the first name of the person whose medical record is to be deleted"
+        - name: lastName
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "the last name of the person whose medical record is to be deleted"
+      responses:
+        '200':
+          description: "OK!"
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: "the medicalRecord for this person does not exist"
+        '400':
+          description: "Invalid input"
+
 components:
   schemas:
     MedicalRecordDto:
@@ -52,6 +107,8 @@ components:
         medications:
           type: array
           description: "the list of all the treatments taken by the patient and their dosage"
+          example: ["aznol:350mg", "ibuprofen:200mg"]
+          nullable: false
           items:
             type: string
             description: "the name and the prescribed dose of the medicine"
@@ -59,10 +116,60 @@ components:
         allergies:
           type: array
           description: "the list of all allergies the patient suffers from"
+          example: ["pollen", "dust"]
+          nullable: false
           items:
             type: string
             description: "the name of the allergen"
             example: "nillacilan"
-
-
-  
+    MedicalRecordUpdateDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: "the firstName of the owner of the medicalRecord"
+        lastName:
+          type: string
+          description: "the lastName of the owner of the medicalRecord"
+        birthdate:
+          type: string
+          description: "the birthdate of the owner of the medicalRecord"
+        medications:
+          type: array
+          items:
+            $ref: '#/components/schemas/MedicationUpdateEntry'
+        allergies:
+          type: array
+          items:
+            $ref: '#/components/schemas/AllergyUpdateEntry'
+    MedicationUpdateEntry:
+      type: object
+      description: "the list of all the update treatments taken by the patient and their dosage and the type of update operation"
+      properties:
+        medication:
+          type: string
+          description: "the name and the prescribed dose of the medicine"
+          example: "aznol:350mg"
+        updateOperation:
+          $ref: '#/components/schemas/MedicationOperationType'
+    AllergyUpdateEntry:
+      type: object
+      description: "the list of all update allergies the patient suffers from and the type of update operation"
+      example:
+      properties:
+        name:
+          type: string
+          description: "the name of the allergen"
+          example: "nillacilan"
+        updateOperation:
+          $ref: '#/components/schemas/AllergyOperationType'
+    MedicationOperationType:
+      type: string
+      description: "the type of operation to perform on the medication"
+      enum: [ADD, REMOVE, UPDATE]
+      example: "ADD"
+    AllergyOperationType:
+      type: string
+      description: "the type of operation to perform on the allergy"
+      enum: [ ADD, REMOVE]
+      example: "ADD"

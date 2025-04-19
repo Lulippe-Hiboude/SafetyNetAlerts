@@ -1,9 +1,9 @@
 package com.lulippe.safetynetalerts.service;
 
 import com.lulippe.safetynetalerts.dto.PersonDto;
-import com.lulippe.safetynetalerts.exception.person_exception.InexistantObjectException;
-import com.lulippe.safetynetalerts.exception.person_exception.InvalidDataException;
-import com.lulippe.safetynetalerts.exception.person_exception.ObjectAlreadyExistsException;
+import com.lulippe.safetynetalerts.exception.entity_exception.InexistantObjectException;
+import com.lulippe.safetynetalerts.exception.entity_exception.InvalidDataException;
+import com.lulippe.safetynetalerts.exception.entity_exception.ObjectAlreadyExistsException;
 import com.lulippe.safetynetalerts.model.Person;
 import com.lulippe.safetynetalerts.repository.PersonRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -49,13 +49,13 @@ class PersonServiceTest {
                 .email("john@doe.com")
                 .build();
 
-        given(personRepository.findPersonByFirstNameAndLastName(personCreateDto.getFirstName(), personCreateDto.getLastName())).willReturn(Optional.empty());
+        given(personRepository.findByFullName(personCreateDto.getFirstName(), personCreateDto.getLastName())).willReturn(Optional.empty());
 
         //when
         personService.handlePersonCreationRequest(personCreateDto);
 
         //then
-        verify(personRepository, (times(1))).savePerson(personArgumentCaptor.capture());
+        verify(personRepository, (times(1))).save(personArgumentCaptor.capture());
         Person personSaved = personArgumentCaptor.getValue();
         assertEquals("John", personSaved.getFirstName());
         assertEquals("Doe", personSaved.getLastName());
@@ -89,11 +89,11 @@ class PersonServiceTest {
                 .phone("1234567890")
                 .email("john@doe.com")
                 .build();
-        given(personRepository.findPersonByFirstNameAndLastName(personCreateDto.getFirstName(), personCreateDto.getLastName())).willReturn(Optional.of(existingPerson));
+        given(personRepository.findByFullName(personCreateDto.getFirstName(), personCreateDto.getLastName())).willReturn(Optional.of(existingPerson));
 
         //when & then
         assertThrows(ObjectAlreadyExistsException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
-        verify(personRepository, times(0)).savePerson(any());
+        verify(personRepository, times(0)).save(any());
     }
 
     @Test
@@ -112,7 +112,7 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InvalidDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
-        verify(personRepository, times(0)).savePerson(any());
+        verify(personRepository, times(0)).save(any());
     }
 
     @Test
@@ -131,7 +131,7 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InvalidDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
-        verify(personRepository, times(0)).savePerson(any());
+        verify(personRepository, times(0)).save(any());
     }
 
     @Test
@@ -150,7 +150,7 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InvalidDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
-        verify(personRepository, times(0)).savePerson(any());
+        verify(personRepository, times(0)).save(any());
     }
 
     @Test
@@ -169,7 +169,7 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InvalidDataException.class, () -> personService.handlePersonCreationRequest(personCreateDto));
-        verify(personRepository, times(0)).savePerson(any());
+        verify(personRepository, times(0)).save(any());
     }
 
     @Test
@@ -195,14 +195,13 @@ class PersonServiceTest {
                 .phone("1234567890")
                 .email("john@doe.com")
                 .build();
-        given(personRepository.findPersonByFirstNameAndLastName(personUpdateDto.getFirstName(), personUpdateDto.getLastName())).willReturn(Optional.ofNullable(existingPerson));
+        given(personRepository.findByFullName(personUpdateDto.getFirstName(), personUpdateDto.getLastName())).willReturn(Optional.of(existingPerson));
 
         //when
         personService.handlePersonUpdateRequest(personUpdateDto);
 
         //then
-        assert existingPerson != null;
-        verify(personRepository, times(1)).savePerson(personArgumentCaptor.capture());
+        verify(personRepository, times(1)).save(personArgumentCaptor.capture());
         Person updatedPerson = personArgumentCaptor.getValue();
         assertEquals(personUpdateDto.getFirstName(), updatedPerson.getFirstName());
         assertEquals(personUpdateDto.getLastName(), updatedPerson.getLastName());
@@ -226,11 +225,11 @@ class PersonServiceTest {
                 .phone(null)
                 .email(null)
                 .build();
-        given(personRepository.findPersonByFirstNameAndLastName(personUpdateDto.getFirstName(), personUpdateDto.getLastName())).willReturn(Optional.empty());
+        given(personRepository.findByFullName(personUpdateDto.getFirstName(), personUpdateDto.getLastName())).willReturn(Optional.empty());
 
         //when & then
         assertThrows(InexistantObjectException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
-        verify(personRepository, times(0)).savePerson(any());
+        verify(personRepository, times(0)).save(any());
     }
 
     @Test
@@ -248,11 +247,11 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InvalidDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
-        verify(personRepository, times(0)).savePerson(any());
+        verify(personRepository, times(0)).save(any());
     }
 
     @Test
-    @DisplayName("should throw InvalidPersonException if firstName is null ")
+    @DisplayName("should throw InvalidPersonException if lastName is null ")
     void shouldThrowInvalidPersonExceptionIfLastNameIsNull() {
         PersonDto personUpdateDto = PersonDto.builder()
                 .firstName("John")
@@ -266,7 +265,7 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InvalidDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
-        verify(personRepository, times(0)).savePerson(any());
+        verify(personRepository, times(0)).save(any());
     }
 
     @Test
@@ -284,7 +283,7 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InvalidDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
-        verify(personRepository, times(0)).savePerson(any());
+        verify(personRepository, times(0)).save(any());
     }
 
     @Test
@@ -302,7 +301,7 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InvalidDataException.class, () -> personService.handlePersonUpdateRequest(personUpdateDto));
-        verify(personRepository, times(0)).savePerson(any());
+        verify(personRepository, times(0)).save(any());
     }
 
     @Test
@@ -320,14 +319,13 @@ class PersonServiceTest {
                 .phone("1234567890")
                 .email("john@doe.com")
                 .build();
-        given(personRepository.findPersonByFirstNameAndLastName(firstName, lastName)).willReturn(Optional.ofNullable(existingPerson));
-
+        given(personRepository.findByFullName(firstName, lastName)).willReturn(Optional.ofNullable(existingPerson));
 
         //when
         personService.handlePersonDeleteRequest(firstName, lastName);
 
         //then
-        verify(personRepository, times(1)).deletePerson(personArgumentCaptor.capture());
+        verify(personRepository, times(1)).delete(personArgumentCaptor.capture());
         Person deletedPerson = personArgumentCaptor.getValue();
         assertEquals(firstName, deletedPerson.getFirstName());
         assertEquals(lastName, deletedPerson.getLastName());
@@ -339,11 +337,11 @@ class PersonServiceTest {
         //given
         final String firstName = "John";
         final String lastName = "Doe";
-        given(personRepository.findPersonByFirstNameAndLastName(firstName, lastName)).willReturn(Optional.empty());
+        given(personRepository.findByFullName(firstName, lastName)).willReturn(Optional.empty());
 
         //when & then
         assertThrows(InexistantObjectException.class, () -> personService.handlePersonDeleteRequest(firstName, lastName));
-        verify(personRepository, times(0)).deletePerson(any());
+        verify(personRepository, times(0)).delete(any());
     }
 
     @Test
@@ -355,7 +353,7 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InvalidDataException.class, () -> personService.handlePersonDeleteRequest(firstName, lastName));
-        verify(personRepository, times(0)).deletePerson(any());
+        verify(personRepository, times(0)).delete(any());
     }
 
     @Test
@@ -367,6 +365,6 @@ class PersonServiceTest {
 
         //when & then
         assertThrows(InvalidDataException.class, () -> personService.handlePersonDeleteRequest(firstName, lastName));
-        verify(personRepository, times(0)).deletePerson(any());
+        verify(personRepository, times(0)).delete(any());
     }
 }

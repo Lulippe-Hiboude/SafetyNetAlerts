@@ -319,6 +319,6 @@ class PersonControllerIT {
                         .param("lastName", lastName)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("firstName or LastName is blank: " + lastName +", " +firstName  ));
+                .andExpect(MockMvcResultMatchers.content().string("firstName or LastName is blank: " + lastName + ", " + firstName));
     }
 }

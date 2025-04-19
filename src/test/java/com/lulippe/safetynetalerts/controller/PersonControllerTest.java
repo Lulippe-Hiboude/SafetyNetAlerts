@@ -2,9 +2,9 @@ package com.lulippe.safetynetalerts.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lulippe.safetynetalerts.dto.PersonDto;
-import com.lulippe.safetynetalerts.exception.person_exception.InexistantObjectException;
-import com.lulippe.safetynetalerts.exception.person_exception.InvalidDataException;
-import com.lulippe.safetynetalerts.exception.person_exception.ObjectAlreadyExistsException;
+import com.lulippe.safetynetalerts.exception.entity_exception.InexistantObjectException;
+import com.lulippe.safetynetalerts.exception.entity_exception.InvalidDataException;
+import com.lulippe.safetynetalerts.exception.entity_exception.ObjectAlreadyExistsException;
 import com.lulippe.safetynetalerts.service.PersonService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

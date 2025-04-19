@@ -29,13 +29,14 @@ class PersonRepositoryTest {
     @Test
     @DisplayName("should return a person")
     void shouldReturnAPerson() {
+        //given
         DataContainer dataContainer = initializeDataContainer();
         given(dataManager.getDataContainer()).willReturn(dataContainer);
         String firstName = "John";
         String lastName = "Doe";
         String email = "john@doe.com";
         //when
-        Optional<Person> expectedPerson = personRepository.findPersonByFirstNameAndLastName(firstName, lastName);
+        Optional<Person> expectedPerson = personRepository.findByFullName(firstName, lastName);
 
         //then
         assertTrue(expectedPerson.isPresent());
@@ -47,6 +48,7 @@ class PersonRepositoryTest {
     @Test
     @DisplayName("should return null if no person found")
     void shouldReturnNullIfNoPersonFound() {
+        //given
         Person person = new Person();
         person.setFirstName("John");
         person.setLastName("Doe");
@@ -58,7 +60,9 @@ class PersonRepositoryTest {
         given(dataManager.getDataContainer()).willReturn(dataContainer);
 
         //when
-        Optional<Person> expectedPerson = personRepository.findPersonByFirstNameAndLastName("Jane", "Doe");
+        Optional<Person> expectedPerson = personRepository.findByFullName("Jane", "Doe");
+
+        //then
         assertTrue(expectedPerson.isEmpty());
     }
 
@@ -73,7 +77,7 @@ class PersonRepositoryTest {
                 .firstName("Jane")
                 .lastName("Doe").build();
         //when
-        personRepository.savePerson(newPerson);
+        personRepository.save(newPerson);
 
         //then
         assertEquals(2, dataContainer.getPersons().size());
@@ -94,13 +98,12 @@ class PersonRepositoryTest {
                 .build();
 
         //when
-        personRepository.savePerson(updatingPerson);
+        personRepository.save(updatingPerson);
 
         //then
         assertEquals(1, dataContainer.getPersons().size());
         assertTrue(dataContainer.getPersons().contains(updatingPerson));
         assertEquals(updatingPerson.getEmail(), dataContainer.getPersons().getFirst().getEmail());
-
     }
 
     @Test
@@ -116,7 +119,7 @@ class PersonRepositoryTest {
                 .build();
 
         //when
-        personRepository.deletePerson(personToDelete);
+        personRepository.delete(personToDelete);
 
         //then
         assertEquals(0, dataContainer.getPersons().size());
