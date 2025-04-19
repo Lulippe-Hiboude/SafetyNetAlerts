@@ -2,9 +2,9 @@ package com.lulippe.safetynetalerts.controller;
 
 import com.lulippe.safetynetalerts.api.PersonApi;
 import com.lulippe.safetynetalerts.dto.PersonDto;
-import com.lulippe.safetynetalerts.exception.person_exception.InexistantPersonException;
-import com.lulippe.safetynetalerts.exception.person_exception.InvalidPersonDataException;
-import com.lulippe.safetynetalerts.exception.person_exception.PersonAlreadyExistsException;
+import com.lulippe.safetynetalerts.exception.entity_exception.InexistantObjectException;
+import com.lulippe.safetynetalerts.exception.entity_exception.InvalidDataException;
+import com.lulippe.safetynetalerts.exception.entity_exception.ObjectAlreadyExistsException;
 import com.lulippe.safetynetalerts.service.PersonService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +29,10 @@ public class PersonController implements PersonApi {
             log.info("Creating person: {}", personCreateDto);
             personService.handlePersonCreationRequest(personCreateDto);
             return ResponseEntity.ok("Person create successfully : " + personCreateDto);
-        } catch (PersonAlreadyExistsException e) {
+        } catch (ObjectAlreadyExistsException e) {
             log.error("Person already exists: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (InvalidPersonDataException e) {
+        } catch (InvalidDataException e) {
             log.error("Person creation failed: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -44,10 +44,10 @@ public class PersonController implements PersonApi {
             log.info("Updating person: {}", personUpdateDto);
             personService.handlePersonUpdateRequest(personUpdateDto);
             return ResponseEntity.ok("Person update successfully : " + personUpdateDto);
-        } catch (InexistantPersonException e) {
+        } catch (InexistantObjectException e) {
             logPersonNotFound(personUpdateDto.getFirstName(), personUpdateDto.getLastName());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (InvalidPersonDataException e) {
+        } catch (InvalidDataException e) {
             log.error("Person update failed: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -59,10 +59,10 @@ public class PersonController implements PersonApi {
             log.info("Deleting person by firstName {} and  lastName {}", firstName, lastName);
             personService.handlePersonDeleteRequest(firstName, lastName);
             return ResponseEntity.ok("Person with firstName " + firstName + " and lastName " + lastName + ", delete successfully.");
-        } catch (InexistantPersonException e) {
+        } catch (InexistantObjectException e) {
             logPersonNotFound(firstName, lastName);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (InvalidPersonDataException e) {
+        } catch (InvalidDataException e) {
             log.error("Person delete failed: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }

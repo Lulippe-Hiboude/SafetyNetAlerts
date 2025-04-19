@@ -3,7 +3,6 @@ package com.lulippe.safetynetalerts.repository.manager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.lulippe.safetynetalerts.dao.DataContainer;
 import com.lulippe.safetynetalerts.exception.json_exception.DataLoadingException;
-import com.lulippe.safetynetalerts.exception.json_exception.InvalidFileException;
 import com.lulippe.safetynetalerts.utils.JsonUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -59,7 +59,7 @@ public class DataManager {
         try {
             return new String(Files.readAllBytes(Paths.get(filePath)));
         } catch (IOException e) {
-            throw new InvalidFileException(e.getMessage());
+            throw new UncheckedIOException("impossible to load json file : " + filePath, e);
         }
     }
 }

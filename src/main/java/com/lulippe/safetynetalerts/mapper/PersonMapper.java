@@ -9,7 +9,6 @@ import org.mapstruct.factory.Mappers;
 public interface PersonMapper {
     PersonMapper INSTANCE = Mappers.getMapper(PersonMapper.class);
 
-
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "firstName", source = "firstName")
     @Mapping(target = "lastName", source = "lastName")
@@ -26,5 +25,5 @@ public interface PersonMapper {
     @Mapping(target = "zip", source = "zip")
     @Mapping(target = "phone", source = "phone")
     @Mapping(target = "email", source = "email")
-    Person ToPerson(final String address, final String city, final String zip, final String phone, final String email, @MappingTarget final Person existingPerson);
+    void ToPerson(final String address, final String city, final String zip, final String phone, final String email, @MappingTarget final Person existingPerson);
 }

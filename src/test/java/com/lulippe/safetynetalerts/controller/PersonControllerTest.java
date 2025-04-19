@@ -2,9 +2,9 @@ package com.lulippe.safetynetalerts.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lulippe.safetynetalerts.dto.PersonDto;
-import com.lulippe.safetynetalerts.exception.person_exception.InexistantPersonException;
-import com.lulippe.safetynetalerts.exception.person_exception.InvalidPersonDataException;
-import com.lulippe.safetynetalerts.exception.person_exception.PersonAlreadyExistsException;
+import com.lulippe.safetynetalerts.exception.entity_exception.InexistantObjectException;
+import com.lulippe.safetynetalerts.exception.entity_exception.InvalidDataException;
+import com.lulippe.safetynetalerts.exception.entity_exception.ObjectAlreadyExistsException;
 import com.lulippe.safetynetalerts.service.PersonService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -71,7 +71,7 @@ class PersonControllerTest {
                 .email("john@doe.com")
                 .build();
 
-        doThrow(new InvalidPersonDataException("firstName or lastName is blank ")).when(personService).handlePersonCreationRequest(personCreateDto);
+        doThrow(new InvalidDataException("firstName or lastName is blank ")).when(personService).handlePersonCreationRequest(personCreateDto);
 
         //when & then
         mockMvc.perform(post("/person")
@@ -95,7 +95,7 @@ class PersonControllerTest {
                 .email(null)
                 .build();
 
-        doThrow(new InvalidPersonDataException("personDto is null")).when(personService).handlePersonCreationRequest(personCreateDto);
+        doThrow(new InvalidDataException("personDto is null")).when(personService).handlePersonCreationRequest(personCreateDto);
 
         //when & then
         mockMvc.perform(post("/person")
@@ -120,7 +120,7 @@ class PersonControllerTest {
                 .email("john@doe.com")
                 .build();
 
-        doThrow(new PersonAlreadyExistsException("Person already exists")).when(personService).handlePersonCreationRequest(personCreateDto);
+        doThrow(new ObjectAlreadyExistsException("Person already exists")).when(personService).handlePersonCreationRequest(personCreateDto);
 
         //when & then
         mockMvc.perform(post("/person")
@@ -144,7 +144,7 @@ class PersonControllerTest {
                 .email("john@doe.com")
                 .build();
 
-        doThrow(new InvalidPersonDataException("firstName or lastName is blank ")).when(personService).handlePersonUpdateRequest(personUpdateDto);
+        doThrow(new InvalidDataException("firstName or lastName is blank ")).when(personService).handlePersonUpdateRequest(personUpdateDto);
 
         //when & then
         mockMvc.perform(MockMvcRequestBuilders.put("/person")
@@ -168,7 +168,7 @@ class PersonControllerTest {
                 .email(null)
                 .build();
 
-        doThrow(new InvalidPersonDataException("personDto is null")).when(personService).handlePersonUpdateRequest(personUpdateDto);
+        doThrow(new InvalidDataException("personDto is null")).when(personService).handlePersonUpdateRequest(personUpdateDto);
 
         //when & then
         mockMvc.perform(MockMvcRequestBuilders.put("/person")
@@ -191,7 +191,7 @@ class PersonControllerTest {
                 .phone("1234567890")
                 .email("john@doe.com")
                 .build();
-        doThrow(new InexistantPersonException("the person with firstName:" + personUpdateDto.getFirstName() + " and lastName: " + personUpdateDto.getLastName() +
+        doThrow(new InexistantObjectException("the person with firstName:" + personUpdateDto.getFirstName() + " and lastName: " + personUpdateDto.getLastName() +
                 " does not exist")).when(personService).handlePersonUpdateRequest(personUpdateDto);
 
 
@@ -251,7 +251,7 @@ class PersonControllerTest {
         //given
         String firstName = "John";
         String lastName = "Doe";
-        doThrow(new InexistantPersonException("Person with firstName " + firstName + " and lastName " + lastName + " does not exist"))
+        doThrow(new InexistantObjectException("Person with firstName " + firstName + " and lastName " + lastName + " does not exist"))
                 .when(personService).handlePersonDeleteRequest(firstName, lastName);
 
         //when & then
@@ -269,7 +269,7 @@ class PersonControllerTest {
         //given
         String firstName = "John";
         String lastName = "  ";
-        doThrow(new InvalidPersonDataException("firstName or lastName is blank "))
+        doThrow(new InvalidDataException("firstName or lastName is blank "))
                 .when(personService).handlePersonDeleteRequest(firstName, lastName);
 
         //when & then
