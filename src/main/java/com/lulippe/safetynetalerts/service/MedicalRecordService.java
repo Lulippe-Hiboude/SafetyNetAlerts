@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -199,22 +200,16 @@ public class MedicalRecordService {
             return;
         }
         cleanAllergyUpdate(updateAllergies);
-
+        //TODO Refactor using map and consumer
         for (AllergyUpdateEntry allergyUpdateEntry : updateAllergies) {
             final String allergyName = allergyUpdateEntry.getName();
 
             switch (allergyUpdateEntry.getUpdateOperation()) {
                 case ADD:
-                    if (existingAllergies.contains(allergyName)) {
-                        log.error("Allergy {} already exists", allergyName);
-                        throw new ObjectAlreadyExistsException("Allergy already exists with name " + allergyName);
-                    }
+                    validateAddOperation(existingAllergies,allergyName,"Allergy");
                     break;
                 case REMOVE:
-                    if (!existingAllergies.contains(allergyName)) {
-                        log.error("Allergy {} does not exist", allergyName);
-                        throw new InexistantObjectException("Allergy " + allergyName + " does not exist");
-                    }
+                    validateRemoveOperation(existingAllergies,allergyName,"Allergy");
                     break;
             }
         }
@@ -255,33 +250,48 @@ public class MedicalRecordService {
         }
 
         cleanMedicationUpdate(updatedMedications);
-
+//TODO Refactor using map and consumer
         for (MedicationUpdateEntry medicationUpdateEntry : updatedMedications) {
             final String med = medicationUpdateEntry.getMedication();
             switch (medicationUpdateEntry.getUpdateOperation()) {
                 case ADD:
-                    if (existingMedications.contains(med)) {
-                        log.error("Medication {} already exists.", med);
-                        throw new ObjectAlreadyExistsException("Medication: " + med + " already exists.");
-                    }
+                    validateAddOperation(existingMedications,med,"Medication");
                     break;
                 case REMOVE:
-                    if (!existingMedications.contains(med)) {
-                        log.error("Medication {} does not exist", med);
-                        throw new InexistantObjectException("Medication " + med + " does not exist");
-                    }
+                    validateRemoveOperation(existingMedications,med,"Medication");
                     break;
                 case UPDATE:
-                    int indexToUpdate = IntStream.range(0, existingMedications.size())
-                            .filter(i -> getMedicationName(existingMedications.get(i)).equals(getMedicationName(med)))
-                            .findFirst()
-                            .orElse(-1);
-
-                    if (indexToUpdate == -1) {
-                        log.error("Medication {} not found for update", med);
-                        throw new InexistantObjectException("Medication " + med + " not found for update");
-                    }
+                    validateUpdateOperation(existingMedications, med, this::getMedicationName,"Medication");
+                    break;
             }
+        }
+    }
+    private void validateUpdateOperation(List<String> existingItems,
+                                         String itemToUpdate,
+                                         Function<String, String> keyExtractor,
+                                         String objectType) {
+
+        boolean exists = existingItems.stream()
+                .map(keyExtractor)
+                .anyMatch(key -> key.equals(keyExtractor.apply(itemToUpdate)));
+
+        if (!exists) {
+            log.error("{} {} not found for update", objectType, itemToUpdate);
+            throw new InexistantObjectException(objectType + " " + itemToUpdate + " not found for update");
+        }
+    }
+
+    private void validateAddOperation(List<String> existingItems, String itemName, String objectType) {
+        if (existingItems.contains(itemName)) {
+            log.error("{} {} already exists", objectType, itemName);
+            throw new ObjectAlreadyExistsException(objectType + " " + itemName + " already exists");
+        }
+    }
+
+    private void validateRemoveOperation(List<String> existingItems, String itemName, String objectType) {
+        if (!existingItems.contains(itemName)) {
+            log.error("{} {} does not exist", objectType, itemName);
+            throw new InexistantObjectException(objectType + " " + itemName + " does not exist");
         }
     }
 
@@ -297,7 +307,7 @@ public class MedicalRecordService {
         return name.trim().toLowerCase();
     }
 
-    private static String getMedicationName(String medication) {
+    private String getMedicationName(String medication) {
         if (!medication.contains(":")) {
             log.error("Medication {} is not a valid medication name", medication);
             throw new InvalidDataException("Medication: " + medication + " is not a valid medication name.");

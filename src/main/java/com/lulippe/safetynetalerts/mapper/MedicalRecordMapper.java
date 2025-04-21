@@ -36,7 +36,7 @@ public interface MedicalRecordMapper {
                 allergies != null ? mapAllergies(allergies, existingMedicalRecord.getAllergies()) : existingMedicalRecord.getAllergies(),
                 existingMedicalRecord);
     }
-
+    //TODO Refactor using map and consumer
     default List<String> mapAllergies(final List<AllergyUpdateEntry> updateAllergies, @NotNull final List<String> existingAllergies) {
         if (updateAllergies == null || updateAllergies.isEmpty()) return existingAllergies;
         for (AllergyUpdateEntry updateAllergy : updateAllergies) {
@@ -53,7 +53,7 @@ public interface MedicalRecordMapper {
         }
         return existingAllergies;
     }
-
+    //TODO Refactor using map and consumer
     default List<String> mapMedications(final List<MedicationUpdateEntry> updateMedications, @NotNull final List<String> existingMedications) {
         if (updateMedications == null || updateMedications.isEmpty()) return existingMedications;
 
