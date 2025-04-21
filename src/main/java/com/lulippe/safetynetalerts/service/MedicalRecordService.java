@@ -10,20 +10,22 @@ import com.lulippe.safetynetalerts.medicalRecord.model.MedicalRecordUpdateDto;
 import com.lulippe.safetynetalerts.medicalRecord.model.MedicationUpdateEntry;
 import com.lulippe.safetynetalerts.model.MedicalRecord;
 import com.lulippe.safetynetalerts.repository.MedicalRecordRepository;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.lulippe.safetynetalerts.utils.LogUtil.logMedicalRecordNotFound;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateLastNameAndFirstName;
+import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateName;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
@@ -145,8 +147,9 @@ public class MedicalRecordService {
     }
 
     private void updateMedicalRecord(MedicalRecordUpdateDto medicalRecordUpdateDto, MedicalRecord existingMedicalRecord) {
-        MedicalRecordMapper.INSTANCE.toMedicalRecord(medicalRecordUpdateDto.getBirthdate(), medicalRecordUpdateDto.getMedications(), medicalRecordUpdateDto.getAllergies()
-                , existingMedicalRecord);
+        MedicalRecordMapper.INSTANCE.partialUpdate(medicalRecordUpdateDto.getBirthdate(), existingMedicalRecord);
+        applyMedicationsUpdates(medicalRecordUpdateDto.getMedications(), existingMedicalRecord.getMedications());
+        applyAllergiesUpdates(medicalRecordUpdateDto.getAllergies(), existingMedicalRecord.getAllergies());
         medicalRecordRepository.save(existingMedicalRecord);
         log.info("MedicalRecord with firstName {} and lastName {} has been successfully updated", existingMedicalRecord.getFirstName(), existingMedicalRecord.getLastName());
     }
@@ -205,16 +208,10 @@ public class MedicalRecordService {
 
             switch (allergyUpdateEntry.getUpdateOperation()) {
                 case ADD:
-                    if (existingAllergies.contains(allergyName)) {
-                        log.error("Allergy {} already exists", allergyName);
-                        throw new ObjectAlreadyExistsException("Allergy already exists with name " + allergyName);
-                    }
+                    validateAddOperation(existingAllergies, allergyName, "Allergy");
                     break;
                 case REMOVE:
-                    if (!existingAllergies.contains(allergyName)) {
-                        log.error("Allergy {} does not exist", allergyName);
-                        throw new InexistantObjectException("Allergy " + allergyName + " does not exist");
-                    }
+                    validateRemoveOperation(existingAllergies, allergyName, "Allergy");
                     break;
             }
         }
@@ -260,35 +257,113 @@ public class MedicalRecordService {
             final String med = medicationUpdateEntry.getMedication();
             switch (medicationUpdateEntry.getUpdateOperation()) {
                 case ADD:
-                    if (existingMedications.contains(med)) {
-                        log.error("Medication {} already exists.", med);
-                        throw new ObjectAlreadyExistsException("Medication: " + med + " already exists.");
-                    }
+                    validateAddOperation(existingMedications, med, "Medication");
                     break;
                 case REMOVE:
-                    if (!existingMedications.contains(med)) {
-                        log.error("Medication {} does not exist", med);
-                        throw new InexistantObjectException("Medication " + med + " does not exist");
-                    }
+                    validateRemoveOperation(existingMedications, med, "Medication");
                     break;
                 case UPDATE:
-                    int indexToUpdate = IntStream.range(0, existingMedications.size())
-                            .filter(i -> getMedicationName(existingMedications.get(i)).equals(getMedicationName(med)))
-                            .findFirst()
-                            .orElse(-1);
-
-                    if (indexToUpdate == -1) {
-                        log.error("Medication {} not found for update", med);
-                        throw new InexistantObjectException("Medication " + med + " not found for update");
-                    }
+                    validateUpdateOperation(existingMedications, med, this::getMedicationName, "Medication");
+                    break;
             }
         }
     }
 
-    private static void validateName(String name) {
-        if (Strings.isBlank(name)) {
-            log.error("Name {} cannot be null or empty", name);
-            throw new InvalidDataException("Name cannot be null or empty");
+    private void validateUpdateOperation(List<String> existingItems, String itemToUpdate,
+                                         Function<String, String> keyExtractor, String objectType) {
+        boolean exists = existingItems.stream()
+                .map(keyExtractor)
+                .anyMatch(key -> key.equals(keyExtractor.apply(itemToUpdate)));
+
+        if (!exists) {
+            log.error("{} {} not found for update", objectType, itemToUpdate);
+            throw new InexistantObjectException(objectType + " " + itemToUpdate + " not found for update");
+        }
+    }
+
+    private void validateAddOperation(List<String> existingItems, String itemName, String objectType) {
+        if (existingItems.contains(itemName)) {
+            log.error("{} {} already exists", objectType, itemName);
+            throw new ObjectAlreadyExistsException(objectType + " " + itemName + " already exists");
+        }
+    }
+
+    private void validateRemoveOperation(List<String> existingItems, String itemName, String objectType) {
+        if (!existingItems.contains(itemName)) {
+            log.error("{} {} does not exist", objectType, itemName);
+            throw new InexistantObjectException(objectType + " " + itemName + " does not exist");
+        }
+    }
+
+    /**
+     * Applies a list of update operations (ADD, REMOVE, UPDATE) to the existing medications list.
+     * Each operation is executed in the order it appears in the update list.
+     *
+     * @param updateMedications the list of {@link MedicationUpdateEntry} to apply.
+     *                          Can be null or empty, in which case no changes are made.
+     * @param existingMedications the list of current medications to be updated.
+     */
+    private void applyMedicationsUpdates(List<MedicationUpdateEntry> updateMedications, List<String> existingMedications) {
+        if (updateMedications == null || updateMedications.isEmpty()) {
+            return;
+        }
+        for (MedicationUpdateEntry updateMedication : updateMedications) {
+            switch (updateMedication.getUpdateOperation()) {
+                case ADD:
+                    existingMedications.add(updateMedication.getMedication());
+                    log.info("Medication {} added", updateMedication.getMedication());
+                    break;
+                case REMOVE:
+                    existingMedications.remove(updateMedication.getMedication());
+                    log.info("Medication {} removed", updateMedication.getMedication());
+                    break;
+                case UPDATE:
+                    applyUpdateMedicationOperation(existingMedications, updateMedication);
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Updates an existing medication in the list based on the medication name (before the colon).
+     * Replaces the old value with the new one.
+     * Assumes that the medication has already been validated to exist in the list.
+     *
+     * @param existingMedications the list of current medications.
+     * @param updateMedication the medication update entry containing the new value.
+     */
+    private void applyUpdateMedicationOperation(List<String> existingMedications, MedicationUpdateEntry updateMedication) {
+        String medicationNameToUpdate = getMedicationName(updateMedication.getMedication());
+        int indexToUpdate = IntStream.range(0, existingMedications.size())
+                .filter(i -> getMedicationName(existingMedications.get(i)).equals(medicationNameToUpdate))
+                .findFirst()
+                .orElse(-1);
+
+        existingMedications.set(indexToUpdate, updateMedication.getMedication());
+        log.info("Medication {} updated", updateMedication.getMedication());
+    }
+
+    /**
+     * Applies a list of update operations (ADD, REMOVE) to the existing allergies list.
+     * Each operation is executed in the order it appears in the update list.
+     *
+     * @param updateAllergies the list of {@link AllergyUpdateEntry} to apply.
+     *                        Can be null or empty, in which case no changes are made.
+     * @param existingAllergies the list of current allergies to be updated.
+     */
+    private void applyAllergiesUpdates(final List<AllergyUpdateEntry> updateAllergies, @NotNull final List<String> existingAllergies) {
+        if (updateAllergies == null || updateAllergies.isEmpty()) return;
+        for (AllergyUpdateEntry updateAllergy : updateAllergies) {
+            switch (updateAllergy.getUpdateOperation()) {
+                case ADD:
+                    existingAllergies.add(updateAllergy.getName());
+                    log.info("Allergy {} added", updateAllergy.getName());
+                    break;
+                case REMOVE:
+                    existingAllergies.remove(updateAllergy.getName());
+                    log.info("Allergy {} removed", updateAllergy.getName());
+                    break;
+            }
         }
     }
 
@@ -297,7 +372,17 @@ public class MedicalRecordService {
         return name.trim().toLowerCase();
     }
 
-    private static String getMedicationName(String medication) {
+    /**
+     * Extracts the medication name (before the colon) from a string representation of a medication.
+     * <p>
+     * The method assumes the medication string is in the format: "name:details". If the string does not
+     * contain a colon, an error is logged and an exception is thrown.
+     *
+     * @param medication the medication string to extract the name from. It should be in the format "name:details".
+     * @return the name of the medication, which is the substring before the colon.
+     * @throws InvalidDataException if the medication string is invalid (does not contain a colon).
+     */
+    private String getMedicationName(String medication) {
         if (!medication.contains(":")) {
             log.error("Medication {} is not a valid medication name", medication);
             throw new InvalidDataException("Medication: " + medication + " is not a valid medication name.");

@@ -303,7 +303,7 @@ public class MedicalRecordControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(medicalRecordUpdateDto)))
                 .andExpect(status().isConflict())
-                .andExpect(MockMvcResultMatchers.content().string("Medication: " + medicationUpdateEntry.getMedication() + " already exists."));
+                .andExpect(MockMvcResultMatchers.content().string("Medication " + medicationUpdateEntry.getMedication() + " already exists"));
         DataContainer updatedData = dataManager.getDataContainer();
         assertEquals(1, updatedData.getMedicalRecords().size());
         assertFalse(updatedData.getMedicalRecords().getFirst().getAllergies().contains("dust"));
@@ -342,7 +342,7 @@ public class MedicalRecordControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(medicalRecordUpdateDto)))
                 .andExpect(status().isConflict())
-                .andExpect(MockMvcResultMatchers.content().string("Allergy already exists with name " + allergyUpdateEntry.getName()));
+                .andExpect(MockMvcResultMatchers.content().string("Allergy " + allergyUpdateEntry.getName() + " already exists"));
         DataContainer updatedData = dataManager.getDataContainer();
         assertEquals(1, updatedData.getMedicalRecords().size());
         assertFalse(updatedData.getMedicalRecords().getFirst().getMedications().contains("paracetamol:1000mg"));
