@@ -15,4 +15,10 @@ public class ValidationUtil {
             throw new InvalidDataException("firstName or LastName is blank: " + firstName + ", " + lastName);
         }
     }
+    public static void validateName(String name) {
+        if (Strings.isBlank(name)) {
+            log.error("Name {} cannot be null or empty", name);
+            throw new InvalidDataException("Name cannot be null or empty");
+        }
+    }
 }
