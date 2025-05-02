@@ -39,7 +39,7 @@ class DataManagerTest {
                 new Person("Johnny", "Boyd", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com")
         ));
         expectedDataContainer.setFireStations(List.of(
-                new FireStation("1509 Culver St", 3)
+                new FireStation("1509 Culver St", "3")
         ));
         expectedDataContainer.setMedicalRecords(List.of(
                 new MedicalRecord("John", "Boyd", "03/06/1984",
@@ -53,7 +53,7 @@ class DataManagerTest {
 
         assertEquals(1, dataContainer.getFireStations().size());
         assertEquals("1509 Culver St", dataContainer.getFireStations().getFirst().getAddress());
-        assertEquals(3, dataContainer.getFireStations().getFirst().getStation());
+        assertEquals("3", dataContainer.getFireStations().getFirst().getStation());
 
         assertEquals(1, dataContainer.getMedicalRecords().size());
         assertEquals("Johnny", dataContainer.getMedicalRecords().getFirst().getFirstName());
@@ -95,7 +95,7 @@ class DataManagerTest {
 
         assertEquals(1, dataManager.getDataContainer().getFireStations().size());
         assertEquals("1509 Culver St", dataManager.getDataContainer().getFireStations().getFirst().getAddress());
-        assertEquals(3, dataManager.getDataContainer().getFireStations().getFirst().getStation());
+        assertEquals("3", dataManager.getDataContainer().getFireStations().getFirst().getStation());
 
         assertEquals(1, dataManager.getDataContainer().getMedicalRecords().size());
         assertEquals("Johnny", dataManager.getDataContainer().getMedicalRecords().getFirst().getFirstName());

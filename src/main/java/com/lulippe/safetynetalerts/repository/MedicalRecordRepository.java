@@ -7,9 +7,7 @@ import lombok.Data;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
-@Data
 @Repository
 @AllArgsConstructor
 public class MedicalRecordRepository extends AbstractCrudRepository<MedicalRecord> {
