@@ -16,4 +16,8 @@ public class LogUtil {
     public static void logMedicalRecordNotFound(String firstName, String lastName) {
         log.error("MedicalRecord with firstName {} and lastName {} does not exist", firstName, lastName);
     }
+
+    public static void logFireStationNumberInvalid(String station) {
+        log.error("Invalid station number {}", station);
+    }
 }

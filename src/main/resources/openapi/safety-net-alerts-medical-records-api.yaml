@@ -89,7 +89,6 @@ paths:
           description: "the medicalRecord for this person does not exist"
         '400':
           description: "Invalid input"
-
 components:
   schemas:
     MedicalRecordDto:
@@ -173,3 +172,4 @@ components:
       description: "the type of operation to perform on the allergy"
       enum: [ ADD, REMOVE]
       example: "ADD"
+

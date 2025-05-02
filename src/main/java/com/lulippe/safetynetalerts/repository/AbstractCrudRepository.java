@@ -2,13 +2,12 @@ package com.lulippe.safetynetalerts.repository;
 
 import java.util.List;
 import java.util.Optional;
-
+//TODO Improve the CrudRepository to be useful for every entity (including fireStation) if possible
 public abstract class AbstractCrudRepository<T> implements CrudRepository<T> {
     protected abstract List<T> getDataList();
     protected abstract String getFirstName(T entity);
     protected abstract String getLastName(T entity);
 
-    @Override
     public Optional<T> findByFullName(String firstName, String lastName) {
         return getDataList().stream()
                 .filter(e -> getFirstName(e).equals(firstName) && getLastName(e).equals(lastName))

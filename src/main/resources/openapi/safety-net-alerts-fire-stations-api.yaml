@@ -1,0 +1,98 @@
+openapi: 3.0.3
+info:
+  title: SafetyNetAlerts FireStations api
+  description: SafetyNetAlerts FireStations api
+  version: 1.0.0
+servers:
+  - url: "/"
+    description: "Current"
+  - url: "http://localhost:8080"
+    description: "localhost"
+tags:
+  - name: "FireStations"
+    description: "Everything for SafetyNetAlerts about the fire stations"
+paths:
+  /firestation:
+    post:
+      tags:
+        - "fireStations"
+      summary: "Create a new fireStation"
+      operationId: "createNewFireStation"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FireStationDto'
+      responses:
+        '200':
+          description: "OK!"
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: "Invalid input"
+        '409':
+          description: "the fireStation with this address already exists"
+    put:
+      tags:
+        - "fireStations"
+      summary: "Update an existing fireStation"
+      operationId: "updateExistingFireStation"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FireStationDto'
+      responses:
+        '200':
+          description: "OK!"
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: "Invalid input"
+        '404':
+          description: "the fireStation does not exist with this address"
+        '409':
+          description: "A fireStation already exists with this station"
+    delete:
+      tags:
+        - "fireStations"
+      summary: "Delete an existing fireStation"
+      operationId: "deleteExistingFireStation"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FireStationDto'
+      responses:
+        '200':
+          description: "OK!"
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: "Invalid input"
+        '404':
+          description: "the fireStation does not exist with this address and this station"
+components:
+  schemas:
+    FireStationDto:
+      type: object
+      description: "a fireStation with its address and its number"
+      example: { "address": "1509 Culver St", "station": "3" }
+      properties:
+        address:
+          type: string
+          description: "the address of the fireStation"
+          example: "1509 Culver St"
+        station:
+          type: string
+          description: "the number of the fireStation"
+          example: 3
