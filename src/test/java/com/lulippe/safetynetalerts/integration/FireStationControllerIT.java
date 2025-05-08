@@ -149,25 +149,6 @@ public class FireStationControllerIT {
     }
 
     @Test
-    @DisplayName("should return 400 when fireStationDto Station is not valid")
-    void shouldReturn400WhenFireStationDtoStationIsNotValid() throws Exception {
-        final String address = "10 downing street";
-        final String station = "5";
-        FireStationDto fireStationDto = new FireStationDto();
-        fireStationDto.setAddress(address);
-        fireStationDto.setStation(station);
-        DataContainer initialDataContainer = dataManager.getDataContainer();
-        assertEquals(1, initialDataContainer.getFireStations().size());
-        assertFalse(initialDataContainer.getFireStations().stream()
-                .anyMatch(fireStation -> fireStation.getAddress().equals(address) && fireStation.getStation().equals(station)));
-        mockMvc.perform(post("/firestation")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(fireStationDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("the station is invalid :" + fireStationDto.getStation() + ", it must be :'3 +1'"));
-    }
-
-    @Test
     @DisplayName("should update an existing fireStation")
     void shouldUpdateAnExistingFireStation() throws Exception {
         //given

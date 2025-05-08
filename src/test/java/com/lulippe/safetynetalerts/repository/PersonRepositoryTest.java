@@ -116,6 +116,7 @@ class PersonRepositoryTest {
                 .firstName("John")
                 .lastName("Doe")
                 .email("john@doe.com")
+                .address("1509 Culver St")
                 .build();
 
         //when
@@ -125,11 +126,41 @@ class PersonRepositoryTest {
         assertEquals(0, dataContainer.getPersons().size());
     }
 
+    @Test
+    @DisplayName("should return a list of person by given address")
+    void shouldReturnAListOfPersonByGivenAddress() {
+        //given
+        DataContainer dataContainer = initializeDataContainer();
+        given(dataManager.getDataContainer()).willReturn(dataContainer);
+
+        //when
+        final List<Person> personList = personRepository.getAllPersonsByAddress("1509 Culver St");
+
+        //then
+        assertEquals(1, personList.size());
+        assertEquals("John", personList.getFirst().getFirstName());
+    }
+
+    @Test
+    @DisplayName("should return an empty list if no person found for given address")
+    void shouldReturnAnEmptyListIfNoPersonFoundForGivenAddress() {
+        //given
+        DataContainer dataContainer = initializeDataContainer();
+        given(dataManager.getDataContainer()).willReturn(dataContainer);
+
+        //when
+        final List<Person> personList = personRepository.getAllPersonsByAddress("10 downing street");
+
+        //then
+        assertEquals(0, personList.size());
+    }
+
     private DataContainer initializeDataContainer() {
         Person person = new Person();
         person.setFirstName("John");
         person.setLastName("Doe");
         person.setEmail("john@doe.com");
+        person.setAddress("1509 Culver St");
         List<Person> personList = new ArrayList<>();
         personList.add(person);
         DataContainer dataContainer = new DataContainer();

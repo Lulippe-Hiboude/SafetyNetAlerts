@@ -6,6 +6,7 @@ import com.lulippe.safetynetalerts.exception.entity_exception.InvalidDataExcepti
 import com.lulippe.safetynetalerts.exception.entity_exception.ObjectAlreadyExistsException;
 import com.lulippe.safetynetalerts.model.Person;
 import com.lulippe.safetynetalerts.repository.PersonRepository;
+import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,6 +38,8 @@ class PersonServiceTest {
 
     @Captor
     private ArgumentCaptor<Person> personArgumentCaptor;
+
+    private final EasyRandom easyRandom= new EasyRandom();
 
     @Test
     @DisplayName("should create a person")
@@ -366,5 +372,37 @@ class PersonServiceTest {
         //when & then
         assertThrows(InvalidDataException.class, () -> personService.handlePersonDeleteRequest(firstName, lastName));
         verify(personRepository, times(0)).delete(any());
+    }
+
+    @Test
+    @DisplayName("should return a list of person for a given address")
+    void shouldReturnAListOfPersonForGivenAddress() {
+        //given
+        final String address ="1509 Culver St";
+        final List<Person> personList = easyRandom.objects(Person.class,5)
+                        .peek(p-> p.setAddress(address))
+                                .toList();
+        given(personRepository.getAllPersonsByAddress(address)).willReturn(personList);
+
+        //when
+        final List<Person> personListExpected = personService.getAllPersonsByAddress(address);
+
+        //then
+        assertEquals(personListExpected, personList);
+    }
+
+    @Test
+    @DisplayName("should return an empty list if no person found for a given address")
+    void shouldReturnAnEmptyListIfNoPersonFoundForGivenAddress() {
+        //given
+        final String address ="1509 Culver St";
+
+        given(personRepository.getAllPersonsByAddress(address)).willReturn(Collections.emptyList());
+
+        //when
+        final List<Person> personListExpected = personService.getAllPersonsByAddress(address);
+
+        //then
+        assertEquals(personListExpected, Collections.emptyList());
     }
 }
