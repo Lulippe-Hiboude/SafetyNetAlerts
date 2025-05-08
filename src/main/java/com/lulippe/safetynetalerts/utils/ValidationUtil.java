@@ -26,10 +26,10 @@ public class ValidationUtil {
         }
     }
 
-    public static void validateName(String name) {
-        if (Strings.isBlank(name)) {
-            log.error("Name {} cannot be null or empty", name);
-            throw new InvalidDataException("Name cannot be null or empty");
+    public static void validateData(String data, String dataName){
+        if (Strings.isBlank(data)) {
+            log.error("{} cannot be null or empty", dataName);
+            throw new InvalidDataException(dataName+ " cannot be null or empty");
         }
     }
 }

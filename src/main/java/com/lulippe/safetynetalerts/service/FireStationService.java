@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.regex.Pattern;
 
 import static com.lulippe.safetynetalerts.utils.LogUtil.logFireStationNumberInvalid;
@@ -58,7 +57,7 @@ public class FireStationService {
         fireStationRepository.save(newFireStation);
     }
 
-    private void updateFireStation(FireStationDto fireStationUpdateDto, FireStation existingFireStation) {
+    private void updateFireStation(final FireStationDto fireStationUpdateDto, final FireStation existingFireStation) {
         FireStationMapper.INSTANCE.toFireStation(fireStationUpdateDto, existingFireStation);
         fireStationRepository.save(existingFireStation);
         log.info("FireStation with address {} successfully updated", existingFireStation.getAddress());
@@ -82,7 +81,7 @@ public class FireStationService {
         return findFireStationByStation(station).isPresent();
     }
 
-    private Optional<FireStation> findFireStationByAddress(final String address) {
+    public Optional<FireStation> findFireStationByAddress(final String address) {
         return fireStationRepository.findByAddress(address);
     }
 
@@ -94,25 +93,15 @@ public class FireStationService {
         return Pattern.matches("\\d+", number);
     }
 
-    private Boolean isStationValid(final String stationDto, final OptionalInt maxStationNumber) {
-        try {
-            int newStationNumber = Integer.parseInt(stationDto.trim());
-
-            return maxStationNumber.isPresent()
-                    ? newStationNumber == maxStationNumber.getAsInt() + 1
-                    : newStationNumber == 1;
-        } catch (NumberFormatException e) {
-            logFireStationNumberInvalid(stationDto);
-            throw new InvalidDataException("Invalid station, please enter a valid number");
-        }
-    }
-
     private void validateCreationData(final FireStationDto fireStationDto) {
         if (isFireStationExist(fireStationDto.getAddress())) {
             log.error("fireStation already exists with this address {}", fireStationDto.getAddress());
             throw new ObjectAlreadyExistsException("FireStation already exists");
         }
-        validateStationNumber(fireStationDto);
+        if (!isStationNumberValid(fireStationDto.getStation())) {
+            logFireStationNumberInvalid(fireStationDto.getStation());
+            throw new InvalidDataException("Invalid station, please enter a valid number");
+        }
     }
 
     private void validateUpdateData(final String station) {
@@ -132,24 +121,12 @@ public class FireStationService {
                 .orElseThrow(() -> new InexistantObjectException("fireStation does not exist with this address: " + fireStationDto.getAddress()));
     }
 
-    private void validateStationNumber(FireStationDto fireStationDto) {
-        OptionalInt maxStationNumber = fireStationRepository.getMaxStationNumber();
-
-        if (!isStationValid(fireStationDto.getStation(), maxStationNumber)) {
-            String expectedValue = maxStationNumber.isPresent()
-                    ? (maxStationNumber.getAsInt() + " +1")
-                    : "1";
-            log.error("the station is invalid {}", fireStationDto.getStation());
-            throw new InvalidDataException("the station is invalid :" + fireStationDto.getStation() + ", it must be :'" + expectedValue + "'");
-        }
-    }
-
     private FireStation getExistingFireStationForDelete(final FireStationDto fireStationDto) {
         if (!isStationNumberValid(fireStationDto.getStation())) {
             logFireStationNumberInvalid(fireStationDto.getStation());
             throw new InvalidDataException("Invalid station, please enter a valid number");
         }
-        return findFireStationByAddressAndStation(fireStationDto.getAddress(),fireStationDto.getStation())
+        return findFireStationByAddressAndStation(fireStationDto.getAddress(), fireStationDto.getStation())
                 .orElseThrow(() -> new InexistantObjectException("fireStation does not exist with this address and this station: address : "
                         + fireStationDto.getAddress() + ", station : " + fireStationDto.getStation()));
     }

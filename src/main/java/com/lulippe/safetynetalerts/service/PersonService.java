@@ -13,6 +13,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.lulippe.safetynetalerts.utils.LogUtil.logPersonNotFound;
@@ -78,6 +79,10 @@ public class PersonService {
         deletePersonByFirstNameAndLastName(cleanFirstName, cleanLastName);
     }
 
+    public List<Person> getAllPersonsByAddress(final String address) {
+        return personRepository.getAllPersonsByAddress(address);
+    }
+
     /**
      * Cleans and normalizes the content of a {@link PersonDto}.
      * <p>
@@ -93,7 +98,6 @@ public class PersonService {
             personDto.setEmail(personDto.getEmail().trim());
         }
     }
-
 
     private void deletePersonByFirstNameAndLastName(final String firstName, final String lastName) {
         findPersonByFirstNameAndLastName(firstName, lastName).ifPresentOrElse(
@@ -138,4 +142,5 @@ public class PersonService {
     private Optional<Person> findPersonByFirstNameAndLastName(final String firstName, final String lastName) {
         return personRepository.findByFullName(firstName, lastName);
     }
+
 }

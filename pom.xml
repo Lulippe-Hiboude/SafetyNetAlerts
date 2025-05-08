@@ -32,9 +32,9 @@
     <!--  ========================================================  -->
     <properties>
         <java.version>21</java.version>
-        <openapi.version>2.5.0</openapi.version>
+        <openapi.version>2.6.0</openapi.version>
         <mockito.version>5.13.0</mockito.version>
-        <swagger.version>2.2.9</swagger.version>
+        <swagger.version>2.2.21</swagger.version>
         <log4j.version>2.23.1</log4j.version>
         <lombok.version>1.18.36</lombok.version>
         <mapstruct.version>1.6.0</mapstruct.version>
@@ -42,6 +42,7 @@
         <jacoco.version>0.8.12</jacoco.version>
         <openapi-generator-plugin.version>7.8.0</openapi-generator-plugin.version>
         <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
+        <jeasy.version>5.0.0</jeasy.version>
     </properties>
 
     <!-- ======================================================== -->
@@ -154,6 +155,13 @@
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
             <version>${jackson-databind-nullable.version}</version>
+        </dependency>
+        <!--Other-->
+        <dependency>
+            <groupId>org.jeasy</groupId>
+            <artifactId>easy-random-core</artifactId>
+            <version>${jeasy.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -271,6 +279,32 @@
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <skipDefaultInterface>true</skipDefaultInterface>
                                 <interfaceOnly>true</interfaceOnly>
+                            </configOptions>
+                            <additionalProperties>
+                                <additionalProperty>removeEnumValuePrefix=false</additionalProperty>
+                            </additionalProperties>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>fireAddressResponse</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/safety-net-alerts-fire-api.yaml</inputSpec>
+                            <apiPackage>com.lulippe.safetynetalerts.fire.api</apiPackage>
+                            <modelPackage>com.lulippe.safetynetalerts.fire.model</modelPackage>
+                            <generatorName>spring</generatorName>
+                            <generateModelTests>true</generateModelTests>
+                            <generateModelDocumentation>true</generateModelDocumentation>
+                            <generateApiTests>true</generateApiTests>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                            <configOptions>
+                                <useTags>true</useTags>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <interfaceOnly>true</interfaceOnly>
+                                <returnResponse>true</returnResponse>
                             </configOptions>
                             <additionalProperties>
                                 <additionalProperty>removeEnumValuePrefix=false</additionalProperty>

@@ -25,7 +25,7 @@ import java.util.stream.IntStream;
 
 import static com.lulippe.safetynetalerts.utils.LogUtil.logMedicalRecordNotFound;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateLastNameAndFirstName;
-import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateName;
+import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateData;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
@@ -33,7 +33,8 @@ import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateName;
 @Service
 public class MedicalRecordService {
     private final MedicalRecordRepository medicalRecordRepository;
-
+    final static String MEDICATION = "Medication";
+    final static String ALLERGY = "Allergy";
     /**
      * Handles the creation process of a new {@link MedicalRecord}.
      * <p>
@@ -118,13 +119,13 @@ public class MedicalRecordService {
         }
         if (!medicalRecordDto.getAllergies().isEmpty()) {
             medicalRecordDto.setAllergies(medicalRecordDto.getAllergies().stream()
-                    .map(this::normalizeAndValidateName)
+                    .map(allergy -> normalizeAndValidateName(allergy,ALLERGY))
                     .collect(Collectors.toList()));
         }
 
         if (!medicalRecordDto.getMedications().isEmpty()) {
             medicalRecordDto.setMedications(medicalRecordDto.getMedications().stream()
-                    .map(this::normalizeAndValidateName)
+                    .map(medication -> normalizeAndValidateName(medication,MEDICATION))
                     .map(s -> s.replaceAll("\\s*:\\s*", ":"))
                     .collect(Collectors.toList()));
         }
@@ -154,7 +155,7 @@ public class MedicalRecordService {
         log.info("MedicalRecord with firstName {} and lastName {} has been successfully updated", existingMedicalRecord.getFirstName(), existingMedicalRecord.getLastName());
     }
 
-    private MedicalRecord getMedicalRecordByFirstNameAndLastName(String firstName, String lastName) {
+    public MedicalRecord getMedicalRecordByFirstNameAndLastName(String firstName, String lastName) {
         return medicalRecordRepository.findByFullName(firstName, lastName)
                 .orElseThrow(() -> {
                     logMedicalRecordNotFound(firstName, lastName);
@@ -182,7 +183,7 @@ public class MedicalRecordService {
      */
     private void cleanAllergyUpdate(List<AllergyUpdateEntry> updateAllergies) {
         updateAllergies.forEach(allergy -> {
-            allergy.setName(normalizeAndValidateName(allergy.getName()));
+            allergy.setName(normalizeAndValidateName(allergy.getName(),ALLERGY));
         });
     }
 
@@ -227,7 +228,7 @@ public class MedicalRecordService {
      */
     private void cleanMedicationUpdate(List<MedicationUpdateEntry> updateMedications) {
         updateMedications.forEach(medication -> {
-            medication.setMedication(normalizeAndValidateName(medication.getMedication()));
+            medication.setMedication(normalizeAndValidateName(medication.getMedication(),MEDICATION));
             medication.setMedication(medication.getMedication().replaceAll("\\s*:\\s*", ":"));
         });
     }
@@ -367,9 +368,9 @@ public class MedicalRecordService {
         }
     }
 
-    private String normalizeAndValidateName(String name) {
-        validateName(name);
-        return name.trim().toLowerCase();
+    private String normalizeAndValidateName(String value, String nameValue) {
+        validateData(value,nameValue);
+        return value.trim().toLowerCase();
     }
 
     /**

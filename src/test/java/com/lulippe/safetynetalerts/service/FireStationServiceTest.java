@@ -46,7 +46,6 @@ class FireStationServiceTest {
         fireStationDto.setAddress(address);
         fireStationDto.setStation(station);
         given(fireStationRepository.findByAddress(address)).willReturn(Optional.empty());
-        given(fireStationRepository.getMaxStationNumber()).willReturn(OptionalInt.of(9));
 
         //when
         fireStationService.handleFireStationCreationRequest(fireStationDto);
@@ -120,7 +119,6 @@ class FireStationServiceTest {
         final String cleanAddress = "10 downing street";
         final String cleanStation = "10";
         given(fireStationRepository.findByAddress(cleanAddress)).willReturn(Optional.empty());
-        given(fireStationRepository.getMaxStationNumber()).willReturn(OptionalInt.of(9));
 
         //when
         fireStationService.handleFireStationCreationRequest(fireStationDto);
@@ -130,24 +128,6 @@ class FireStationServiceTest {
         final FireStation fireStationExpected = fireStationCaptor.getValue();
         assertEquals(cleanAddress, fireStationExpected.getAddress());
         assertEquals(cleanStation, fireStationExpected.getStation());
-    }
-
-    @Test
-    @DisplayName("should throw Invalid data exception if station is invalid")
-    void shouldThrowInvalidDataExceptionIfStationIsInvalid() {
-        //given
-        final String address = "10 downing street";
-        final String station = "10";
-
-        final FireStationDto fireStationDto = new FireStationDto();
-        fireStationDto.setAddress(address);
-        fireStationDto.setStation(station);
-        given(fireStationRepository.findByAddress(address)).willReturn(Optional.empty());
-        given(fireStationRepository.getMaxStationNumber()).willReturn(OptionalInt.of(8));
-
-        //when
-        assertThrows(InvalidDataException.class, () -> fireStationService.handleFireStationCreationRequest(fireStationDto));
-        verify(fireStationRepository, times(0)).save(any());
     }
 
     @Test
@@ -161,44 +141,6 @@ class FireStationServiceTest {
         given(fireStationRepository.findByAddress(address)).willReturn(Optional.empty());
         assertThrows(InvalidDataException.class, () -> fireStationService.handleFireStationCreationRequest(fireStationDto));
         verify(fireStationRepository, times(0)).save(any());
-    }
-
-    @Test
-    @DisplayName("Should throw invalid data exception if first station is not 1")
-    void shouldThrowInvalidDataExceptionIfFirstStationIsNot1() {
-        //given
-        final String address = "10 downing street";
-        final String station = "10";
-        final FireStationDto fireStationDto = new FireStationDto();
-        fireStationDto.setAddress(address);
-        fireStationDto.setStation(station);
-        given(fireStationRepository.findByAddress(address)).willReturn(Optional.empty());
-        given(fireStationRepository.getMaxStationNumber()).willReturn(OptionalInt.empty());
-
-        //when & then
-        assertThrows(InvalidDataException.class, () -> fireStationService.handleFireStationCreationRequest(fireStationDto));
-        verify(fireStationRepository, times(0)).save(any());
-    }
-
-    @Test
-    @DisplayName("should create the first fireStation with station equal 1")
-    void shouldCreateTheFirstFireStationWithStationEqual1() {
-        final String address = "10 downing street";
-        final String station = "1";
-        final FireStationDto fireStationDto = new FireStationDto();
-        fireStationDto.setAddress(address);
-        fireStationDto.setStation(station);
-        given(fireStationRepository.findByAddress(address)).willReturn(Optional.empty());
-        given(fireStationRepository.getMaxStationNumber()).willReturn(OptionalInt.empty());
-
-        //when
-        fireStationService.handleFireStationCreationRequest(fireStationDto);
-
-        //then
-        verify(fireStationRepository, times(1)).save(fireStationCaptor.capture());
-        final FireStation fireStationExpected = fireStationCaptor.getValue();
-        assertEquals(address, fireStationExpected.getAddress());
-        assertEquals(station, fireStationExpected.getStation());
     }
 
     @Test

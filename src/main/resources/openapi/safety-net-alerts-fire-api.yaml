@@ -1,0 +1,83 @@
+openapi: 3.0.3
+info:
+  title: SafetyNetAlerts Fire api
+  description: SafetyNetAlerts Fire api
+  version: 1.0.0
+servers:
+  - url: "/"
+    description: "Current"
+  - url: "http://localhost:8080"
+    description: "localhost"
+tags:
+  - name: "Fire"
+    description: "Everything for safetyNetAlerts about fire"
+paths:
+  /fire:
+    get:
+      tags:
+        - "Fire"
+      summary: "List of all Persons living at a given address, including their medical records and the fireStation number serving that address"
+      operationId: getFireResponse
+      parameters:
+        - in: query
+          name: address
+          required: true
+          schema:
+            type: string
+            description: "the address being queried"
+      responses:
+        '200':
+          description: "Persons found at the given address and the linked fireStation number"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FireAddressResponse'
+        '400':
+          description: "Invalid input"
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: "Not found - no fireStation found for the given address"
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  schemas:
+    FireAddressResponse:
+      type: object
+      properties:
+        stationNumber:
+          type: string
+          example: "3"
+        residents:
+          type: array
+          items:
+            $ref: '#/components/schemas/FireResident'
+    FireResident:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Boyd"
+        phone:
+          type: string
+          example: "841-874-7878"
+        age:
+          type: integer
+          example: 36
+        medications:
+          type: array
+          items:
+            type: string
+            example: "paracetamol:1000mg"
+        allergies:
+          type: array
+          items:
+            type: string
+            example: "nillacilan"

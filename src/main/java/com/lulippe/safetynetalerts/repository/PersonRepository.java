@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 @AllArgsConstructor
@@ -18,12 +19,20 @@ public class PersonRepository extends AbstractCrudRepository<Person> {
     }
 
     @Override
-    protected String getFirstName(Person entity) {
+    protected String getFirstName(final Person entity) {
         return entity.getFirstName();
     }
 
     @Override
-    protected String getLastName(Person entity) {
+    protected String getLastName(final Person entity) {
         return entity.getLastName();
+    }
+
+    public List<Person> getAllPersonsByAddress(final String address) {
+        return dataManager.getDataContainer()
+                .getPersons()
+                .stream()
+                .filter(p -> p.getAddress().equals(address))
+                .toList();
     }
 }

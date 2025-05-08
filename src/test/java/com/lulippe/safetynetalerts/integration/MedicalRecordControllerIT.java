@@ -380,7 +380,7 @@ public class MedicalRecordControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(medicalRecordUpdateDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("Name cannot be null or empty"));
+                .andExpect(MockMvcResultMatchers.content().string("Medication cannot be null or empty"));
         DataContainer updatedData = dataManager.getDataContainer();
         assertEquals(1, updatedData.getMedicalRecords().size());
         assertFalse(updatedData.getMedicalRecords().getFirst().getAllergies().contains("dust"));
@@ -418,7 +418,7 @@ public class MedicalRecordControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(medicalRecordUpdateDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("Name cannot be null or empty"));
+                .andExpect(MockMvcResultMatchers.content().string("Allergy cannot be null or empty"));
         DataContainer updatedData = dataManager.getDataContainer();
         assertEquals(1, updatedData.getMedicalRecords().size());
         assertFalse(updatedData.getMedicalRecords().getFirst().getMedications().contains("paracetamol:1000mg"));
