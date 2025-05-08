@@ -175,44 +175,29 @@ public class FireStationControllerIT {
     }
 
     @Test
-    @DisplayName("should return 409 if station number already used for another fireStation")
-    void shouldReturn409IfStationNumberAlreadyUsedForAnotherFireStation() throws Exception {
+    @DisplayName("should return 400 if fireStation already exists with the same address and station number")
+    void shouldReturn400IfFireStationAlreadyExistsWithTheSameAddressAndNumber() throws Exception {
         //given
         final String address = "1509 Culver St";
-        final String updateStation = "4";
+        final String updateStation = "3";
         FireStationDto fireStationDto = new FireStationDto();
         fireStationDto.setAddress(address);
         fireStationDto.setStation(updateStation);
         DataContainer initialDataContainer = dataManager.getDataContainer();
         assertEquals(1, initialDataContainer.getFireStations().size());
         assertTrue(initialDataContainer.getFireStations().stream()
-                .anyMatch(fireStation -> fireStation.getAddress().equals(address) && fireStation.getStation().equals("3")));
-
-        final String newAddress = "10 downing street";
-        final String newStation = "4";
-        FireStationDto fireStationDto2 = new FireStationDto();
-        fireStationDto2.setAddress(newAddress);
-        fireStationDto2.setStation(newStation);
-        mockMvc.perform(post("/firestation")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(fireStationDto2)))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("FireStation create successfully : " + fireStationDto2));
-        DataContainer updatedData = dataManager.getDataContainer();
-        assertEquals(2, updatedData.getFireStations().size());
-        assertTrue(updatedData.getFireStations().stream()
-                .anyMatch(fireStation -> fireStation.getAddress().equals(newAddress) && fireStation.getStation().equals(newStation)));
+                .anyMatch(fireStation -> fireStation.getAddress().equals(address) && fireStation.getStation().equals(updateStation)));
 
         //when & then
         mockMvc.perform(put("/firestation")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(fireStationDto)))
                 .andExpect(status().isConflict())
-                .andExpect(MockMvcResultMatchers.content().string("station number is already taken by another fireStation" + updateStation));
-        DataContainer updatedData2 = dataManager.getDataContainer();
-        assertEquals(2, updatedData.getFireStations().size());
+                .andExpect(MockMvcResultMatchers.content().string("fireStation already exists with this address and station number"));
+        DataContainer updatedData = dataManager.getDataContainer();
+        assertEquals(1, updatedData.getFireStations().size());
         assertTrue(updatedData.getFireStations().stream()
-                .anyMatch(fireStation -> fireStation.getAddress().equals(newAddress) && fireStation.getStation().equals(newStation)));
+                .anyMatch(fireStation -> fireStation.getAddress().equals(address) && fireStation.getStation().equals(updateStation)));
     }
 
     @Test

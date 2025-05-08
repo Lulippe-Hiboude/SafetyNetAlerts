@@ -13,6 +13,29 @@ tags:
     description: "Everything for SafetyNetAlerts about the fire stations"
 paths:
   /firestation:
+    get:
+      tags:
+        - "fireStations"
+      summary: "Get redidents covered by a specific fire station"
+      operationId: "getResidentsByFireStation"
+      parameters:
+        - name: stationNumber
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "the number of the fire station"
+      responses:
+        '200':
+          description: "List of residents covered by the fire station"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FireStationCoverageResponse'
+        '404':
+          description: "No residents found for this station number or no fire station found for this station number"
+        '400':
+          description: "Invalid input"
     post:
       tags:
         - "fireStations"
@@ -96,3 +119,32 @@ components:
           type: string
           description: "the number of the fireStation"
           example: 3
+    FireStationCoverageResponse:
+      type: object
+      description: "Response containing a list of residents covered and their count"
+      properties:
+        residents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResidentInfo'
+        adultCount:
+          type: integer
+          example: 2
+        childCount:
+          type: integer
+          example: 1
+    ResidentInfo:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        address:
+          type: string
+          example: "1509 Culver St"
+        phone:
+          type: string
+          example: "841-874-6512"
