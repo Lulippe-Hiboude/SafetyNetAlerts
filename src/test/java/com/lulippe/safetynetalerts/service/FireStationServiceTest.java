@@ -157,7 +157,6 @@ class FireStationServiceTest {
                 .station("10")
                 .build();
         given(fireStationRepository.findByAddress(address)).willReturn(Optional.of(existingFireStation));
-        given(fireStationRepository.findByStation(station)).willReturn(Optional.empty());
 
         //when
         fireStationService.handleFireStationUpdateRequest(fireStationDto);
@@ -213,8 +212,23 @@ class FireStationServiceTest {
     }
 
     @Test
-    @DisplayName("should throw ObjectAlreadyExists if station is already use")
-    void shouldThrowObjectAlreadyExistsIfStationIsAlreadyUse() {
+    @DisplayName("should throw InexistantObjectException if fireStation does not exist with the address")
+    void shouldThrowInexistantObjectExceptionIfFireStationDoesNotExistWithTheAddress() {
+        final String address = "10 downing street";
+        final String station = "13";
+        final FireStationDto fireStationDto = new FireStationDto();
+        fireStationDto.setAddress(address);
+        fireStationDto.setStation(station);
+        given(fireStationRepository.findByAddress(address)).willReturn(Optional.empty());
+
+        //when & then
+        assertThrows(InexistantObjectException.class, () -> fireStationService.handleFireStationUpdateRequest(fireStationDto));
+        verify(fireStationRepository, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("should throw Object already exists exception if fireStation already exists with this station and address")
+    void shouldThrowObjectAlreadyExistsExceptionIfFireStationAlreadyExistsWithThisStationAndAddress() {
         //given
         final String address = "10 downing street";
         final String station = "13";
@@ -223,29 +237,13 @@ class FireStationServiceTest {
         fireStationDto.setStation(station);
 
         final FireStation existingFireStation = FireStation.builder()
-                .address("12 downing street")
+                .address(address)
                 .station(station)
                 .build();
-        given(fireStationRepository.findByStation(station)).willReturn(Optional.of(existingFireStation));
+        given(fireStationRepository.findByAddress(address)).willReturn(Optional.of(existingFireStation));
 
         //when & then
         assertThrows(ObjectAlreadyExistsException.class, () -> fireStationService.handleFireStationUpdateRequest(fireStationDto));
-        verify(fireStationRepository, times(0)).save(any());
-    }
-
-    @Test
-    @DisplayName("should throw InexistantObjectException if fireStation does not exist with the address")
-    void shouldThrowInexistantObjectExceptionIfFireStationDoesNotExistWithTheAddress() {
-        final String address = "10 downing street";
-        final String station = "13";
-        final FireStationDto fireStationDto = new FireStationDto();
-        fireStationDto.setAddress(address);
-        fireStationDto.setStation(station);
-        given(fireStationRepository.findByStation(station)).willReturn(Optional.empty());
-        given(fireStationRepository.findByAddress(address)).willReturn(Optional.empty());
-
-        //when & then
-        assertThrows(InexistantObjectException.class, () -> fireStationService.handleFireStationUpdateRequest(fireStationDto));
         verify(fireStationRepository, times(0)).save(any());
     }
 

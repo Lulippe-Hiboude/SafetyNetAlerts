@@ -24,9 +24,11 @@ import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateStringsDa
 @Data
 @Service
 public class FireStationService {
+    public static final String STATION_NUMBER = "station number";
     private final FireStationRepository fireStationRepository;
     final static String FIRE_STATION_ADDRESS = "fireStation address";
     final static String FIRE_STATION_NUMBER = "fireStation number";
+    private final PersonService personService;
 
     public void handleFireStationCreationRequest(final FireStationDto fireStationCreateDto) {
         validateStringsData(fireStationCreateDto.getAddress(), fireStationCreateDto.getStation(),
@@ -77,16 +79,8 @@ public class FireStationService {
         return findFireStationByAddress(address).isPresent();
     }
 
-    private Boolean isStationExist(final String station) {
-        return findFireStationByStation(station).isPresent();
-    }
-
     public Optional<FireStation> findFireStationByAddress(final String address) {
         return fireStationRepository.findByAddress(address);
-    }
-
-    private Optional<FireStation> findFireStationByStation(final String station) {
-        return fireStationRepository.findByStation(station);
     }
 
     private Boolean isStationNumberValid(final String number) {
@@ -104,21 +98,19 @@ public class FireStationService {
         }
     }
 
-    private void validateUpdateData(final String station) {
-        if (isStationExist(station)) {
-            log.error("station number {} is  already taken by another fireStation", station);
-            throw new ObjectAlreadyExistsException("station number is already taken by another fireStation" + station);
-        }
-    }
-
     private FireStation getExistingFireStationForUpdate(final FireStationDto fireStationDto) {
-        validateUpdateData(fireStationDto.getStation());
+
         if (!isStationNumberValid(fireStationDto.getStation())) {
             logFireStationNumberInvalid(fireStationDto.getStation());
             throw new InvalidDataException("Invalid station, please enter a valid number");
         }
-        return findFireStationByAddress(fireStationDto.getAddress())
+        final FireStation existingFireStation = findFireStationByAddress(fireStationDto.getAddress())
                 .orElseThrow(() -> new InexistantObjectException("fireStation does not exist with this address: " + fireStationDto.getAddress()));
+
+        if(existingFireStation.getStation().equals(fireStationDto.getStation())) {
+            throw new ObjectAlreadyExistsException("fireStation already exists with this address and station number");
+        }
+        return existingFireStation;
     }
 
     private FireStation getExistingFireStationForDelete(final FireStationDto fireStationDto) {
