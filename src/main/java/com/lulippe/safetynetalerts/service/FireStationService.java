@@ -162,10 +162,10 @@ public class FireStationService {
 
 
     private Map<String, Integer> countAdultsAndChildren(final List<Person> personsCoveredByFireStation) {
-        if(personsCoveredByFireStation.equals(Collections.emptyList())) {
+        if (personsCoveredByFireStation.equals(Collections.emptyList())) {
             return Map.of(
                     "adults", 0,
-                    "children",0
+                    "children", 0
             );
         }
         Map<Boolean, Long> counts = personsCoveredByFireStation.stream()

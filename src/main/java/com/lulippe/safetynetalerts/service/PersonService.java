@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.lulippe.safetynetalerts.utils.LogUtil.logPersonNotFound;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateLastNameAndFirstName;
@@ -141,5 +143,20 @@ public class PersonService {
 
     private Optional<Person> findPersonByFirstNameAndLastName(final String firstName, final String lastName) {
         return personRepository.findByFullName(firstName, lastName);
+    }
+
+    public Set<String> getEmailListByCity(final String city) {
+        final List<Person> personList = personRepository.getAllPersonsByCity(city)
+                .orElseThrow(() -> new InexistantObjectException("No Person found for this city" + city));
+
+        return personList.stream()
+                .map(person -> {
+                    if (Strings.isBlank(person.getEmail())) {
+                        log.warn("{} {} does not have an email", person.getFirstName(), person.getLastName());
+                        return "";
+                    }
+                    return person.getEmail();
+                })
+                .collect(Collectors.toSet());
     }
 }

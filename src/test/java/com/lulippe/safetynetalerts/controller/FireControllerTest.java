@@ -1,6 +1,5 @@
 package com.lulippe.safetynetalerts.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lulippe.safetynetalerts.exception.entity_exception.InexistantObjectException;
 import com.lulippe.safetynetalerts.exception.entity_exception.InvalidDataException;
 import com.lulippe.safetynetalerts.fire.model.FireAddressResponse;
@@ -27,6 +26,8 @@ class FireControllerTest {
 
     @MockitoBean
     private FireService fireService;
+
+
 
     @Test
     @DisplayName("should return FireAddressResponse when address is valid")

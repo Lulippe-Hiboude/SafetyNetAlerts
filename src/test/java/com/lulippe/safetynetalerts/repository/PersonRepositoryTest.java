@@ -117,6 +117,7 @@ class PersonRepositoryTest {
                 .lastName("Doe")
                 .email("john@doe.com")
                 .address("1509 Culver St")
+                .city("New York")
                 .build();
 
         //when
@@ -144,8 +145,8 @@ class PersonRepositoryTest {
     }
 
     @Test
-    @DisplayName("should return an empty list if no person found for given address")
-    void shouldReturnAnEmptyListIfNoPersonFoundForGivenAddress() {
+    @DisplayName("should return an optional empty  if no person found for given address")
+    void shouldReturnAnOptionalEmptyIfNoPersonFoundForGivenAddress() {
         //given
         DataContainer dataContainer = initializeDataContainer();
         given(dataManager.getDataContainer()).willReturn(dataContainer);
@@ -154,8 +155,35 @@ class PersonRepositoryTest {
         final Optional<List<Person>> personList = personRepository.getAllPersonsByAddress("10 downing street");
 
         //then
+        assertTrue(personList.isEmpty());
+    }
+
+    @Test
+    @DisplayName("should return a list of Person by city")
+    void shouldReturnAListOfPersonByCity() {
+        //given
+        DataContainer dataContainer = initializeDataContainer();
+        given(dataManager.getDataContainer()).willReturn(dataContainer);
+
+        //when
+        final Optional<List<Person>> personList = personRepository.getAllPersonsByCity("New York");
         assertTrue(personList.isPresent());
-        assertTrue(personList.get().isEmpty());
+        List<Person> persons = personList.get();
+        assertEquals(1, persons.size());
+    }
+
+    @Test
+    @DisplayName("should return optionalEmpty if no person found for a given city")
+    void shouldReturnAnOptionalEmptyIfNoPersonFoundForGivenCity() {
+        //given
+        DataContainer dataContainer = initializeDataContainer();
+        given(dataManager.getDataContainer()).willReturn(dataContainer);
+
+        //when
+        final Optional<List<Person>> personList = personRepository.getAllPersonsByCity("city");
+
+        //then
+        assertTrue(personList.isEmpty());
     }
 
     private DataContainer initializeDataContainer() {
@@ -164,6 +192,7 @@ class PersonRepositoryTest {
         person.setLastName("Doe");
         person.setEmail("john@doe.com");
         person.setAddress("1509 Culver St");
+        person.setCity("New York");
         List<Person> personList = new ArrayList<>();
         personList.add(person);
         DataContainer dataContainer = new DataContainer();

@@ -3,7 +3,6 @@ package com.lulippe.safetynetalerts.service;
 import com.lulippe.safetynetalerts.exception.entity_exception.InexistantObjectException;
 import com.lulippe.safetynetalerts.exception.entity_exception.InvalidDataException;
 import com.lulippe.safetynetalerts.exception.entity_exception.ObjectAlreadyExistsException;
-
 import com.lulippe.safetynetalerts.fireStation.model.FireStationCoverageResponse;
 import com.lulippe.safetynetalerts.fireStation.model.FireStationDto;
 import com.lulippe.safetynetalerts.model.FireStation;
@@ -20,7 +19,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -353,7 +355,7 @@ class FireStationServiceTest {
 
         final MedicalRecord medicalRecord = easyRandom.nextObject(MedicalRecord.class);
 
-        given(medicalRecordService.getMedicalRecordByFirstNameAndLastName(any(),any())).willReturn(medicalRecord);
+        given(medicalRecordService.getMedicalRecordByFirstNameAndLastName(any(), any())).willReturn(medicalRecord);
         given(medicalRecordService.calculatePersonAge(medicalRecord.getBirthdate())).willReturn(24);
         //when
         final FireStationCoverageResponse expectedFireStationCoverageResponse = fireStationService.getResidentsByFireStation(stationNumber);
@@ -362,8 +364,8 @@ class FireStationServiceTest {
         assertNotNull(expectedFireStationCoverageResponse);
         assertEquals(4, expectedFireStationCoverageResponse.getAdultCount());
         assertEquals(0, expectedFireStationCoverageResponse.getChildCount());
-        assertEquals(person1.getFirstName(),expectedFireStationCoverageResponse.getResidents().getFirst().getFirstName());
-        assertEquals(person4.getFirstName(),expectedFireStationCoverageResponse.getResidents().getLast().getFirstName());
+        assertEquals(person1.getFirstName(), expectedFireStationCoverageResponse.getResidents().getFirst().getFirstName());
+        assertEquals(person4.getFirstName(), expectedFireStationCoverageResponse.getResidents().getLast().getFirstName());
     }
 
     @Test
@@ -428,6 +430,6 @@ class FireStationServiceTest {
         assertNotNull(expectedFireStationCoverageResponse);
         assertEquals(Collections.emptyList(), expectedFireStationCoverageResponse.getResidents());
         assertEquals(0, expectedFireStationCoverageResponse.getChildCount());
-        assertEquals(0,expectedFireStationCoverageResponse.getAdultCount());
+        assertEquals(0, expectedFireStationCoverageResponse.getAdultCount());
     }
 }

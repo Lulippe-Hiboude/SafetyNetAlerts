@@ -1,0 +1,66 @@
+openapi: 3.0.3
+info:
+  title: SafetyNetAlerts CommunityEmail api
+  description: SafetyNetAlerts CommunityEmail api
+  version: 1.0.0
+servers:
+  - url: "/"
+    description: "Current"
+  - url: "http://localhost:8080"
+    description: "localhost"
+tags:
+  - name: "CommunityEmail"
+    description: "Everything for safetyNetAlerts about CommunityEmail"
+paths:
+  /communityEmail:
+    get:
+      tags:
+        - "CommunityEmail"
+      summary: "List of mail of all residents in a given city"
+      operationId: getCommunityEmail
+      parameters:
+        - in: query
+          name: city
+          required: true
+          schema:
+            type: string
+            description: "the city being queried"
+      responses:
+        '200':
+          description: "a list of mail of all residents in the given city"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityEmailList'
+        '400':
+          description: "Invalid input"
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: "Not found - no resident found for the given city"
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  schemas:
+    CommunityEmailList:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailEntry'
+          description: "List of email addresses of residents in the city"
+      example:
+        emails:
+          - "email : john.doe@example.com"
+          - "email : jane.smith@example.com"
+    EmailEntry:
+      type: object
+      properties:
+        email:
+          type: string
+          description: "Email address of a resident, empty if missing"
