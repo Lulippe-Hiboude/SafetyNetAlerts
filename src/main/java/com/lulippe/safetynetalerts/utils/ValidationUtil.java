@@ -20,21 +20,21 @@ public class ValidationUtil {
     public static void validateStringsData(final String firstData, final String secondData,
                                            final String firstDataName, final String secondDataName) {
         if (Strings.isBlank(firstData) || Strings.isBlank(secondData)) {
-            log.error("Invalid data: {} or {} is blank : {} : '{}', {}: '{}'", firstDataName,secondDataName,
-                    firstDataName, firstData,secondDataName,secondData);
+            log.error("Invalid data: {} or {} is blank : {} : '{}', {}: '{}'", firstDataName, secondDataName,
+                    firstDataName, firstData, secondDataName, secondData);
             throw new InvalidDataException(firstDataName + " or " + secondDataName + " is blank: " + firstData + ", " + secondData);
         }
     }
 
-    public static void validateData(final String data, final String dataName){
+    public static void validateData(final String data, final String dataName) {
         if (Strings.isBlank(data)) {
             log.error("{} cannot be null or empty", dataName);
-            throw new InvalidDataException(dataName+ " cannot be null or empty");
+            throw new InvalidDataException(dataName + " cannot be null or empty");
         }
     }
 
-    public static String normalizeAndValidate(final String data, final String dataName){
-        validateData(data,dataName);
+    public static String normalizeAndValidate(final String data, final String dataName) {
+        validateData(data, dataName);
         return data.trim();
     }
 

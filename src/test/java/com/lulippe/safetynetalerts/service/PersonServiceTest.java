@@ -16,10 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,7 +35,7 @@ class PersonServiceTest {
     @Captor
     private ArgumentCaptor<Person> personArgumentCaptor;
 
-    private final EasyRandom easyRandom= new EasyRandom();
+    private final EasyRandom easyRandom = new EasyRandom();
 
     @Test
     @DisplayName("should create a person")
@@ -377,10 +374,10 @@ class PersonServiceTest {
     @DisplayName("should return a list of person for a given address")
     void shouldReturnAListOfPersonForGivenAddress() {
         //given
-        final String address ="1509 Culver St";
-        final List<Person> personList = easyRandom.objects(Person.class,5)
-                        .peek(p-> p.setAddress(address))
-                                .toList();
+        final String address = "1509 Culver St";
+        final List<Person> personList = easyRandom.objects(Person.class, 5)
+                .peek(p -> p.setAddress(address))
+                .toList();
         given(personRepository.getAllPersonsByAddress(address)).willReturn(Optional.of(personList));
 
         //when
@@ -396,7 +393,7 @@ class PersonServiceTest {
     @DisplayName("should return an empty list if no person found for a given address")
     void shouldReturnAnEmptyListIfNoPersonFoundForGivenAddress() {
         //given
-        final String address ="1509 Culver St";
+        final String address = "1509 Culver St";
 
         given(personRepository.getAllPersonsByAddress(address)).willReturn(Optional.empty());
 
@@ -405,5 +402,54 @@ class PersonServiceTest {
 
         //then
         assertTrue(personListExpected.isEmpty());
+    }
+
+    @Test
+    @DisplayName("should return a set of emails")
+    void shouldReturnASetOfEmails() {
+        //given
+        final String city = "city";
+        final String email1 = "john@doe.com";
+        final String email2 = "j@doe.com";
+        final String email3 = "";
+        final Person person1 = easyRandom.nextObject(Person.class);
+        person1.setCity(city);
+        person1.setEmail(email1);
+        final Person person2 = easyRandom.nextObject(Person.class);
+        person2.setCity(city);
+        person2.setEmail(email2);
+        final Person person3 = easyRandom.nextObject(Person.class);
+        person3.setCity(city);
+        person3.setEmail(email1);
+        final Person person4 = easyRandom.nextObject(Person.class);
+        person4.setCity(city);
+        person4.setEmail(null);
+
+        final List<Person> personList = new ArrayList<>();
+        personList.add(person1);
+        personList.add(person2);
+        personList.add(person3);
+        personList.add(person4);
+
+        given(personRepository.getAllPersonsByCity(city)).willReturn(Optional.of(personList));
+
+        //when
+        final Set<String> expectedEmails = personService.getEmailListByCity(city);
+
+        //then
+        assertTrue(expectedEmails.contains(email1));
+        assertTrue(expectedEmails.contains(email2));
+        assertTrue(expectedEmails.contains(email3));
+        assertEquals(3,expectedEmails.size());
+    }
+
+    @Test
+    @DisplayName("should throw InexistantObjectException if no person found for given city")
+    void shouldThrowInexistantObjectExceptionIfNoPersonFoundForGivenCity() {
+        final String city = "city";
+        given(personRepository.getAllPersonsByCity(city)).willReturn(Optional.empty());
+
+        //when & then
+        assertThrows(InexistantObjectException.class, () -> {personService.getEmailListByCity(city);});
     }
 }

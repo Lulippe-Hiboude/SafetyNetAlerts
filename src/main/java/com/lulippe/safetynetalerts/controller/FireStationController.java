@@ -1,17 +1,12 @@
 package com.lulippe.safetynetalerts.controller;
 
 
-import com.lulippe.safetynetalerts.exception.entity_exception.InexistantObjectException;
-import com.lulippe.safetynetalerts.exception.entity_exception.InvalidDataException;
-import com.lulippe.safetynetalerts.exception.entity_exception.ObjectAlreadyExistsException;
-import com.lulippe.safetynetalerts.fire.model.FireAddressResponse;
 import com.lulippe.safetynetalerts.fireStation.api.FireStationsApi;
 import com.lulippe.safetynetalerts.fireStation.model.FireStationCoverageResponse;
 import com.lulippe.safetynetalerts.fireStation.model.FireStationDto;
 import com.lulippe.safetynetalerts.service.FireStationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,9 +18,9 @@ public class FireStationController implements FireStationsApi {
 
     @Override
     public ResponseEntity<String> createNewFireStation(final FireStationDto fireStationDto) {
-            log.info("Creating fireStation: {}", fireStationDto);
-            fireStationService.handleFireStationCreationRequest(fireStationDto);
-            return ResponseEntity.ok("FireStation create successfully : " + fireStationDto);
+        log.info("Creating fireStation: {}", fireStationDto);
+        fireStationService.handleFireStationCreationRequest(fireStationDto);
+        return ResponseEntity.ok("FireStation create successfully : " + fireStationDto);
     }
 
     @Override
@@ -37,9 +32,9 @@ public class FireStationController implements FireStationsApi {
 
     @Override
     public ResponseEntity<String> deleteExistingFireStation(final FireStationDto fireStationDto) {
-            log.info("Deleting fireStation: {}", fireStationDto);
-            fireStationService.handleFireStationDeleteRequest(fireStationDto);
-            return ResponseEntity.ok("FireStation deleted successfully : " + fireStationDto);
+        log.info("Deleting fireStation: {}", fireStationDto);
+        fireStationService.handleFireStationDeleteRequest(fireStationDto);
+        return ResponseEntity.ok("FireStation deleted successfully : " + fireStationDto);
     }
 
     @Override

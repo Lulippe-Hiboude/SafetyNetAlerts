@@ -26,6 +26,6 @@ public interface FireMapper {
 
     @Mapping(target = "stationNumber", source = "station")
     @Mapping(target = "residents", source = "residents")
-    FireAddressResponse toFireAddressResponse(String station, List<FireResident> residents);
+    FireAddressResponse toFireAddressResponse(final String station, final List<FireResident> residents);
 }
 

@@ -32,8 +32,8 @@ public class FireService {
     private final FireStationService fireStationService;
     private final PersonService personService;
     private final MedicalRecordService medicalRecordService;
-    final static String ADDRESS = "address";
-    final static String BIRTHDATE = "birthdate";
+    private static final String ADDRESS = "address";
+    static final String BIRTHDATE = "birthdate";
 
     public FireAddressResponse handleFireRequest(final String address) {
         final String cleanAddress = normalizeAndValidate(address, ADDRESS);

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 @AllArgsConstructor
@@ -34,6 +33,17 @@ public class PersonRepository extends AbstractCrudRepository<Person> {
                 .getPersons()
                 .stream()
                 .filter(p -> p.getAddress().equals(address))
-                .toList());
+                .toList()
+        ).filter(list->!list.isEmpty());
+    }
+
+    public Optional<List<Person>> getAllPersonsByCity(final String city) {
+        return Optional.of(
+                dataManager.getDataContainer()
+                        .getPersons()
+                        .stream()
+                        .filter(p -> p.getCity().equals(city))
+                        .toList()
+        ).filter(list -> !list.isEmpty());
     }
 }

@@ -19,7 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -241,15 +242,16 @@ class FireStationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(objectMapper.writeValueAsString(fireStationCoverageResponse)));
     }
+
     @Test
     @DisplayName("should return not found if service throw an InexistantObjectException")
     void shouldReturnNotFoundWhenServiceThrowAnInexistantObjectException() throws Exception {
         final String stationNumber = "1";
-       given(fireStationService.getResidentsByFireStation(stationNumber)).willThrow(new InexistantObjectException("No fire station found"));
+        given(fireStationService.getResidentsByFireStation(stationNumber)).willThrow(new InexistantObjectException("No fire station found"));
 
-       //when & then
+        //when & then
         mockMvc.perform(MockMvcRequestBuilders.get("/firestation")
-        .param("stationNumber", stationNumber))
+                        .param("stationNumber", stationNumber))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("No fire station found"));
     }

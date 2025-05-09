@@ -206,12 +206,10 @@
                 <version>${jacoco.version}</version>
                 <configuration>
                     <excludes>
-                        <exclude>com/lulippe/safetynetalerts/fire/model/**</exclude>
-                        <exclude>com/lulippe/safetynetalerts/fire/api/**</exclude>
-                        <exclude>com/lulippe/safetynetalerts/firestation/model/**</exclude>
-                        <exclude>com/lulippe/safetynetalerts/firestation/api/**</exclude>
-                        <exclude>com/lulippe/safetynetalerts/medicalrecord/model/**</exclude>
-                        <exclude>com/lulippe/safetynetalerts/medicalrecord/api/**</exclude>
+                        <exclude>com/lulippe/safetynetalerts/fire/**</exclude>
+                        <exclude>com/lulippe/safetynetalerts/fireStation/**</exclude>
+                        <exclude>com/lulippe/safetynetalerts/medicalRecord/**</exclude>
+                        <exclude>com/lulippe/safetynetalerts/communityEmail/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -304,6 +302,32 @@
                             <inputSpec>${project.basedir}/src/main/resources/openapi/safety-net-alerts-fire-api.yaml</inputSpec>
                             <apiPackage>com.lulippe.safetynetalerts.fire.api</apiPackage>
                             <modelPackage>com.lulippe.safetynetalerts.fire.model</modelPackage>
+                            <generatorName>spring</generatorName>
+                            <generateModelTests>true</generateModelTests>
+                            <generateModelDocumentation>true</generateModelDocumentation>
+                            <generateApiTests>true</generateApiTests>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                            <configOptions>
+                                <useTags>true</useTags>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <interfaceOnly>true</interfaceOnly>
+                                <returnResponse>true</returnResponse>
+                            </configOptions>
+                            <additionalProperties>
+                                <additionalProperty>removeEnumValuePrefix=false</additionalProperty>
+                            </additionalProperties>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>CommunityEmailList</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/safety-net-alerts-communityEmail-api.yaml</inputSpec>
+                            <apiPackage>com.lulippe.safetynetalerts.communityEmail.api</apiPackage>
+                            <modelPackage>com.lulippe.safetynetalerts.communityEmail.model</modelPackage>
                             <generatorName>spring</generatorName>
                             <generateModelTests>true</generateModelTests>
                             <generateModelDocumentation>true</generateModelDocumentation>
