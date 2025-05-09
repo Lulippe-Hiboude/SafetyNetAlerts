@@ -26,10 +26,16 @@ public class ValidationUtil {
         }
     }
 
-    public static void validateData(String data, String dataName){
+    public static void validateData(final String data, final String dataName){
         if (Strings.isBlank(data)) {
             log.error("{} cannot be null or empty", dataName);
             throw new InvalidDataException(dataName+ " cannot be null or empty");
         }
     }
+
+    public static String normalizeAndValidate(final String data, final String dataName){
+        validateData(data,dataName);
+        return data.trim();
+    }
+
 }

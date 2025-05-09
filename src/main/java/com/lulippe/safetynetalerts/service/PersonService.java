@@ -79,7 +79,7 @@ public class PersonService {
         deletePersonByFirstNameAndLastName(cleanFirstName, cleanLastName);
     }
 
-    public List<Person> getAllPersonsByAddress(final String address) {
+    public Optional<List<Person>> getAllPersonsByAddress(final String address) {
         return personRepository.getAllPersonsByAddress(address);
     }
 
@@ -94,7 +94,7 @@ public class PersonService {
     private void cleanPersonDto(final PersonDto personDto) {
         personDto.setFirstName(personDto.getFirstName().trim());
         personDto.setLastName(personDto.getLastName().trim());
-        if(!Strings.isBlank(personDto.getEmail())) {
+        if (!Strings.isBlank(personDto.getEmail())) {
             personDto.setEmail(personDto.getEmail().trim());
         }
     }
@@ -142,5 +142,4 @@ public class PersonService {
     private Optional<Person> findPersonByFirstNameAndLastName(final String firstName, final String lastName) {
         return personRepository.findByFullName(firstName, lastName);
     }
-
 }

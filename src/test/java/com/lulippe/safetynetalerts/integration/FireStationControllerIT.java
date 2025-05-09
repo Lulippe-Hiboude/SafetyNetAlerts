@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -390,5 +390,36 @@ public class FireStationControllerIT {
         assertEquals(1, updatedData.getFireStations().size());
         assertTrue(updatedData.getFireStations().stream()
                 .anyMatch(fireStation -> fireStation.getAddress().equals("1509 Culver St") && fireStation.getStation().equals("3")));
+    }
+
+    @Test
+    @DisplayName("should get a FireStationCoverageResponse")
+    void shouldGetFireStationCoverageResponse() throws Exception {
+        //given
+        final String station = "3";
+        DataContainer initialDataContainer = dataManager.getDataContainer();
+
+        //when & then
+        mockMvc.perform(get("/firestation")
+                .param("stationNumber", station))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.residents[0].firstName").value("Johnny"))
+                .andExpect(jsonPath("$.residents[0].lastName").value("Boyd"))
+                .andExpect(jsonPath("$.residents[0].address").value("1509 Culver St"))
+                .andExpect(jsonPath("$.adultCount").value(1))
+                .andExpect(jsonPath("$.childCount").value(0));
+    }
+
+    @Test
+    @DisplayName("should return bad request for GetFireStationCoverageResponse")
+    void shouldReturnBadRequestForGetFireStationCoverageResponse() throws Exception {
+        final String station = "three";
+        DataContainer initialDataContainer = dataManager.getDataContainer();
+
+        //when & then
+        mockMvc.perform(get("/firestation")
+                .param("stationNumber", station))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Invalid station, please enter a valid number"));
     }
 }

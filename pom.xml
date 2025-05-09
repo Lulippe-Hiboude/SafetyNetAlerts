@@ -204,6 +204,16 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>com/lulippe/safetynetalerts/fire/model/**</exclude>
+                        <exclude>com/lulippe/safetynetalerts/fire/api/**</exclude>
+                        <exclude>com/lulippe/safetynetalerts/firestation/model/**</exclude>
+                        <exclude>com/lulippe/safetynetalerts/firestation/api/**</exclude>
+                        <exclude>com/lulippe/safetynetalerts/medicalrecord/model/**</exclude>
+                        <exclude>com/lulippe/safetynetalerts/medicalrecord/api/**</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
