@@ -16,7 +16,7 @@ paths:
     get:
       tags:
         - "fireStations"
-      summary: "Get redidents covered by a specific fire station"
+      summary: "Get residents covered by a specific fire station"
       operationId: "getResidentsByFireStation"
       parameters:
         - name: stationNumber

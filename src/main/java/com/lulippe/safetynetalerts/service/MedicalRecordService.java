@@ -14,6 +14,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
+import org.joda.time.Years;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.lulippe.safetynetalerts.service.FireService.BIRTHDATE;
 import static com.lulippe.safetynetalerts.utils.LogUtil.logMedicalRecordNotFound;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateLastNameAndFirstName;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateData;
@@ -95,6 +100,15 @@ public class MedicalRecordService {
         String cleanFirstName = firstName.trim();
         String cleanLastName = lastName.trim();
         deleteMedicalRecordByFullName(cleanFirstName, cleanLastName);
+    }
+
+    public int calculatePersonAge(final String birthdate) {
+        validateData(birthdate,BIRTHDATE);
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("MM/dd/yyyy");
+        DateTime birth = formatter.parseDateTime(birthdate);
+        DateTime now = DateTime.now();
+        Years age = Years.yearsBetween(birth, now);
+        return age.getYears();
     }
 
     /**

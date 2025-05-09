@@ -94,6 +94,19 @@ class FireStationRepositoryTest {
         assertEquals(0, dataContainer.getFireStations().size());
     }
 
+    @Test
+    @DisplayName("should return all fire station")
+    void shouldReturnAllFireStations() {
+        DataContainer dataContainer = initializeDataContainer();
+        given(dataManager.getDataContainer()).willReturn(dataContainer);
+
+        //when
+        final List<FireStation> fireStationList = fireStationRepository.findAll();
+
+        //then
+        assertEquals(1, fireStationList.size());
+    }
+
     private DataContainer initializeDataContainer() {
         FireStation fireStation = FireStation.builder()
                 .address("10 downing street")

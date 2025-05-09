@@ -32,6 +32,10 @@ public class FireStationRepository implements CrudRepository<FireStation> {
         getDataList().remove(entity);
     }
 
+    public List<FireStation> findAll() {
+        return getDataList();
+    }
+
     public Optional<FireStation> findByAddress(String address) {
         return getDataList().stream().filter(fireStation -> fireStation.getAddress().equals(address)).findFirst();
     }
@@ -40,16 +44,5 @@ public class FireStationRepository implements CrudRepository<FireStation> {
         return getDataList().stream()
                 .filter(fireStation -> fireStation.getAddress().equals(address) && fireStation.getStation().equals(station))
                 .findFirst();
-    }
-
-    public Optional<FireStation> findByStation(String station) {
-        return getDataList().stream().filter(fireStation -> fireStation.getStation().equals(station)).findFirst();
-    }
-
-    public OptionalInt getMaxStationNumber(){
-        return getDataList().stream()
-                .map(FireStation::getStation)
-                .mapToInt(Integer::parseInt)
-                .max();
     }
 }

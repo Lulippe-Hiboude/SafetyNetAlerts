@@ -1008,4 +1008,16 @@ class MedicalRecordServiceTest {
         assertThrows(InvalidDataException.class, () -> medicalRecordService.handleMedicalRecordDeleteRequest(firstName,lastName));
         verify(medicalRecordRepository,(times(0))).delete(any());
     }
+
+    @Test
+    @DisplayName("should calculate the age of a person by his birthdate")
+    void shouldCalculateTheAgeOfAPersonByHisBirthdate() {
+        //given
+        final String birthdate = "03/06/1984";
+        //when
+        final int expectedAge = medicalRecordService.calculatePersonAge(birthdate);
+        //then
+        assertEquals(41,expectedAge);
+    }
+
 }

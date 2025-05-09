@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lulippe.safetynetalerts.exception.entity_exception.InexistantObjectException;
 import com.lulippe.safetynetalerts.exception.entity_exception.InvalidDataException;
 import com.lulippe.safetynetalerts.exception.entity_exception.ObjectAlreadyExistsException;
+import com.lulippe.safetynetalerts.fireStation.model.FireStationCoverageResponse;
 import com.lulippe.safetynetalerts.fireStation.model.FireStationDto;
 import com.lulippe.safetynetalerts.service.FireStationService;
+import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +18,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -33,6 +35,8 @@ class FireStationControllerTest {
 
     @MockitoBean
     private FireStationService fireStationService;
+
+    private final EasyRandom easyRandom = new EasyRandom();
 
     @Test
     @DisplayName("Should create a new fireStation")
@@ -218,9 +222,48 @@ class FireStationControllerTest {
 
         //when & then
         mockMvc.perform(MockMvcRequestBuilders.delete("/firestation")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(fireStationDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(fireStationDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("fireStationAddress" + " or " + "Station number" + " is blank: " + address + ", " + station));
+    }
+
+    @Test
+    @DisplayName("should get FireStationCoverageResponse")
+    void shouldGetFireStationCoverageResponse() throws Exception {
+        final String stationNumber = "1";
+        final FireStationCoverageResponse fireStationCoverageResponse = easyRandom.nextObject(FireStationCoverageResponse.class);
+        given(fireStationService.getResidentsByFireStation(stationNumber)).willReturn(fireStationCoverageResponse);
+
+        //when & then
+        mockMvc.perform(MockMvcRequestBuilders.get("/firestation")
+                        .param("stationNumber", stationNumber))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(fireStationCoverageResponse)));
+    }
+    @Test
+    @DisplayName("should return not found if service throw an InexistantObjectException")
+    void shouldReturnNotFoundWhenServiceThrowAnInexistantObjectException() throws Exception {
+        final String stationNumber = "1";
+       given(fireStationService.getResidentsByFireStation(stationNumber)).willThrow(new InexistantObjectException("No fire station found"));
+
+       //when & then
+        mockMvc.perform(MockMvcRequestBuilders.get("/firestation")
+        .param("stationNumber", stationNumber))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("No fire station found"));
+    }
+
+    @Test
+    @DisplayName("should return Bad request if service throw an InvalidDataException")
+    void shouldReturnBadRequestWhenServiceThrowAnInvalidDataException() throws Exception {
+        final String stationNumber = "quatre";
+        given(fireStationService.getResidentsByFireStation(stationNumber)).willThrow(new InvalidDataException("Invalid station, please enter a valid number"));
+
+        //when & then
+        mockMvc.perform(MockMvcRequestBuilders.get("/firestation")
+                        .param("stationNumber", stationNumber))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Invalid station, please enter a valid number"));
     }
 }

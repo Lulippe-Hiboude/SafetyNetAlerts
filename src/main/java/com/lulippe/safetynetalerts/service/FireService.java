@@ -18,8 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import static com.lulippe.safetynetalerts.utils.ValidationUtil.normalizeAndValidate;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateData;
 
 @Slf4j
@@ -34,7 +36,7 @@ public class FireService {
     final static String BIRTHDATE = "birthdate";
 
     public FireAddressResponse handleFireRequest(final String address) {
-        final String cleanAddress = normalizeAndValidateAddress(address);
+        final String cleanAddress = normalizeAndValidate(address, ADDRESS);
 
         final FireStation existingfireStation = getFireStation(cleanAddress);
         final List<Person> personList = getPersonListByAddress(cleanAddress);
@@ -61,7 +63,7 @@ public class FireService {
     }
 
     private int calculatePersonAge(final String birthdate) {
-        validateData(birthdate,BIRTHDATE);
+        validateData(birthdate, BIRTHDATE);
         DateTimeFormatter formatter = DateTimeFormat.forPattern("MM/dd/yyyy");
         DateTime birth = formatter.parseDateTime(birthdate);
         DateTime now = DateTime.now();
@@ -70,16 +72,11 @@ public class FireService {
     }
 
     private List<Person> getPersonListByAddress(final String cleanAddress) {
-        return personService.getAllPersonsByAddress(cleanAddress);
+        return personService.getAllPersonsByAddress(cleanAddress).orElse(Collections.emptyList());
     }
 
     private FireStation getFireStation(final String address) {
         return fireStationService.findFireStationByAddress(address)
                 .orElseThrow(() -> new InexistantObjectException("No fireStation for this address"));
-    }
-
-    private String normalizeAndValidateAddress(final String address) {
-        validateData(address,ADDRESS);
-        return address.trim();
     }
 }

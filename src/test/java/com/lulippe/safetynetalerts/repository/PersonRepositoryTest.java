@@ -134,11 +134,13 @@ class PersonRepositoryTest {
         given(dataManager.getDataContainer()).willReturn(dataContainer);
 
         //when
-        final List<Person> personList = personRepository.getAllPersonsByAddress("1509 Culver St");
+        final Optional<List<Person>> personList = personRepository.getAllPersonsByAddress("1509 Culver St");
 
         //then
-        assertEquals(1, personList.size());
-        assertEquals("John", personList.getFirst().getFirstName());
+        assertTrue(personList.isPresent());
+        List<Person> persons = personList.get();
+        assertEquals(1, persons.size());
+        assertEquals("John", persons.getFirst().getFirstName());
     }
 
     @Test
@@ -149,10 +151,11 @@ class PersonRepositoryTest {
         given(dataManager.getDataContainer()).willReturn(dataContainer);
 
         //when
-        final List<Person> personList = personRepository.getAllPersonsByAddress("10 downing street");
+        final Optional<List<Person>> personList = personRepository.getAllPersonsByAddress("10 downing street");
 
         //then
-        assertEquals(0, personList.size());
+        assertTrue(personList.isPresent());
+        assertTrue(personList.get().isEmpty());
     }
 
     private DataContainer initializeDataContainer() {

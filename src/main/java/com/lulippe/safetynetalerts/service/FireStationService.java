@@ -3,9 +3,14 @@ package com.lulippe.safetynetalerts.service;
 import com.lulippe.safetynetalerts.exception.entity_exception.InexistantObjectException;
 import com.lulippe.safetynetalerts.exception.entity_exception.InvalidDataException;
 import com.lulippe.safetynetalerts.exception.entity_exception.ObjectAlreadyExistsException;
+import com.lulippe.safetynetalerts.fireStation.model.FireStationCoverageResponse;
 import com.lulippe.safetynetalerts.fireStation.model.FireStationDto;
+import com.lulippe.safetynetalerts.fireStation.model.ResidentInfo;
 import com.lulippe.safetynetalerts.mapper.FireStationMapper;
+import com.lulippe.safetynetalerts.mapper.PersonMapper;
 import com.lulippe.safetynetalerts.model.FireStation;
+import com.lulippe.safetynetalerts.model.MedicalRecord;
+import com.lulippe.safetynetalerts.model.Person;
 import com.lulippe.safetynetalerts.repository.FireStationRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +18,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.lulippe.safetynetalerts.utils.LogUtil.logFireStationNumberInvalid;
+import static com.lulippe.safetynetalerts.utils.ValidationUtil.normalizeAndValidate;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateStringsData;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
@@ -29,6 +40,23 @@ public class FireStationService {
     final static String FIRE_STATION_ADDRESS = "fireStation address";
     final static String FIRE_STATION_NUMBER = "fireStation number";
     private final PersonService personService;
+    private final MedicalRecordService medicalRecordService;
+
+    public FireStationCoverageResponse getResidentsByFireStation(final String stationNumber) {
+        final String cleanStationNumber = normalizeAndValidate(stationNumber, STATION_NUMBER);
+        final List<FireStation> fireStations = getFireStation(stationNumber, cleanStationNumber);
+        final List<Person> personsCoveredByFireStation = fireStations.stream()
+                .flatMap(fireStation -> getAllPersonsByAddress(fireStation.getAddress())
+                        .stream()
+                )
+                .toList();
+        final Map<String, Integer> counts = countAdultsAndChildren(personsCoveredByFireStation);
+        final List<ResidentInfo> residents = personsCoveredByFireStation.stream()
+                .map(PersonMapper.INSTANCE::ToResidentInfo)
+                .toList();
+
+        return FireStationMapper.INSTANCE.toFireStationCoverageResponse(residents, counts);
+    }
 
     public void handleFireStationCreationRequest(final FireStationDto fireStationCreateDto) {
         validateStringsData(fireStationCreateDto.getAddress(), fireStationCreateDto.getStation(),
@@ -107,7 +135,7 @@ public class FireStationService {
         final FireStation existingFireStation = findFireStationByAddress(fireStationDto.getAddress())
                 .orElseThrow(() -> new InexistantObjectException("fireStation does not exist with this address: " + fireStationDto.getAddress()));
 
-        if(existingFireStation.getStation().equals(fireStationDto.getStation())) {
+        if (existingFireStation.getStation().equals(fireStationDto.getStation())) {
             throw new ObjectAlreadyExistsException("fireStation already exists with this address and station number");
         }
         return existingFireStation;
@@ -125,5 +153,44 @@ public class FireStationService {
 
     private Optional<FireStation> findFireStationByAddressAndStation(final String address, final String station) {
         return fireStationRepository.findByAddressAndStation(address, station);
+    }
+
+    private List<Person> getAllPersonsByAddress(final String address) {
+        return personService.getAllPersonsByAddress(address)
+                .orElseGet(Collections::emptyList);
+    }
+
+
+    private Map<String, Integer> countAdultsAndChildren(final List<Person> personsCoveredByFireStation) {
+        if(personsCoveredByFireStation.equals(Collections.emptyList())) {
+            return Map.of(
+                    "adults", 0,
+                    "children",0
+            );
+        }
+        Map<Boolean, Long> counts = personsCoveredByFireStation.stream()
+                .map(person -> {
+                    final MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFirstNameAndLastName(person.getFirstName(), person.getLastName());
+                    int age = medicalRecordService.calculatePersonAge(medicalRecord.getBirthdate());
+                    return age >= 18;
+                })
+                .collect(Collectors.partitioningBy(isAdult -> isAdult, Collectors.counting()));
+        return Map.of(
+                "adults", counts.getOrDefault(true, 0L).intValue(),
+                "children", counts.getOrDefault(false, 0L).intValue()
+        );
+    }
+
+    private List<FireStation> getFireStation(final String stationNumber, final String cleanStationNumber) {
+        if (isStationNumberValid(cleanStationNumber)) {
+            return Optional.of(fireStationRepository.findAll()
+                            .stream()
+                            .filter(fs -> fs.getStation().equals(cleanStationNumber))
+                            .distinct()
+                            .collect(toList()))
+                    .filter(list -> !list.isEmpty())
+                    .orElseThrow(() -> new InexistantObjectException("No fireStations found for this station number: " + stationNumber));
+        }
+        throw new InvalidDataException("Invalid station, please enter a valid number");
     }
 }

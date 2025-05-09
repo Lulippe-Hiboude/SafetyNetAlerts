@@ -21,8 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -188,8 +187,8 @@ class PersonServiceTest {
                 .address("75 rue de la Gare")
                 .city("Lyon")
                 .zip("69001")
-                .phone(null)
-                .email(null)
+                .phone("1234567890")
+                .email("john@doe.com")
                 .build();
 
         Person existingPerson = Person.builder()
@@ -382,13 +381,15 @@ class PersonServiceTest {
         final List<Person> personList = easyRandom.objects(Person.class,5)
                         .peek(p-> p.setAddress(address))
                                 .toList();
-        given(personRepository.getAllPersonsByAddress(address)).willReturn(personList);
+        given(personRepository.getAllPersonsByAddress(address)).willReturn(Optional.of(personList));
 
         //when
-        final List<Person> personListExpected = personService.getAllPersonsByAddress(address);
+        final Optional<List<Person>> personListExpected = personService.getAllPersonsByAddress(address);
 
         //then
-        assertEquals(personListExpected, personList);
+        assertTrue(personListExpected.isPresent());
+        final List<Person> persons = personListExpected.get();
+        assertEquals(persons, personList);
     }
 
     @Test
@@ -397,12 +398,12 @@ class PersonServiceTest {
         //given
         final String address ="1509 Culver St";
 
-        given(personRepository.getAllPersonsByAddress(address)).willReturn(Collections.emptyList());
+        given(personRepository.getAllPersonsByAddress(address)).willReturn(Optional.empty());
 
         //when
-        final List<Person> personListExpected = personService.getAllPersonsByAddress(address);
+        final Optional<List<Person>> personListExpected = personService.getAllPersonsByAddress(address);
 
         //then
-        assertEquals(personListExpected, Collections.emptyList());
+        assertTrue(personListExpected.isEmpty());
     }
 }

@@ -1,6 +1,7 @@
 package com.lulippe.safetynetalerts.mapper;
 
 import com.lulippe.safetynetalerts.dto.PersonDto;
+import com.lulippe.safetynetalerts.fireStation.model.ResidentInfo;
 import com.lulippe.safetynetalerts.model.Person;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -26,4 +27,11 @@ public interface PersonMapper {
     @Mapping(target = "phone", source = "phone")
     @Mapping(target = "email", source = "email")
     void ToPerson(final String address, final String city, final String zip, final String phone, final String email, @MappingTarget final Person existingPerson);
+
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "firstName", source = "person.firstName")
+    @Mapping(target = "lastName", source = "person.lastName")
+    @Mapping(target = "address", source = "person.address")
+    @Mapping(target = "phone", source = "person.phone")
+    ResidentInfo ToResidentInfo(final Person person);
 }
