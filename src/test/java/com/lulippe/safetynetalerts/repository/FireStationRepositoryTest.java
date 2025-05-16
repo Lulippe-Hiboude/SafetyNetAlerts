@@ -107,6 +107,37 @@ class FireStationRepositoryTest {
         assertEquals(1, fireStationList.size());
     }
 
+    @Test
+    @DisplayName("should return a list of fireStation by stationNumber")
+    void shouldReturnAListOfFireStationByStationNumber() {
+        //given
+        final String stationNumber = "1";
+        DataContainer dataContainer = initializeDataContainer();
+        given(dataManager.getDataContainer()).willReturn(dataContainer);
+
+        //when
+        final List<FireStation> fireStationList =fireStationRepository .findByStation(stationNumber);
+
+        //then
+        assertEquals(1, fireStationList.size());
+        assertEquals(stationNumber,fireStationList.getFirst().getStation());
+    }
+
+    @Test
+    @DisplayName("should return an empty list if no fireStation found with given station number")
+    void shouldReturnAnEmptyListIfNoFireStationFoundWithGivenStationNumber() {
+        //given
+        final String stationNumber = "2";
+        DataContainer dataContainer = initializeDataContainer();
+        given(dataManager.getDataContainer()).willReturn(dataContainer);
+
+        //when
+        final List<FireStation> fireStationList =fireStationRepository .findByStation(stationNumber);
+
+        //then
+        assertEquals(0, fireStationList.size());
+    }
+
     private DataContainer initializeDataContainer() {
         FireStation fireStation = FireStation.builder()
                 .address("10 downing street")

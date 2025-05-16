@@ -72,7 +72,7 @@ public class FireService {
     }
 
     private List<Person> getPersonListByAddress(final String cleanAddress) {
-        return personService.getAllPersonsByAddress(cleanAddress).orElse(Collections.emptyList());
+        return personService.getAllPersonsByAddress(cleanAddress);
     }
 
     private FireStation getFireStation(final String address) {

@@ -1,5 +1,6 @@
 package com.lulippe.safetynetalerts.repository;
 
+import com.lulippe.safetynetalerts.exception.entity_exception.InexistantObjectException;
 import com.lulippe.safetynetalerts.model.Person;
 import com.lulippe.safetynetalerts.repository.manager.DataManager;
 import lombok.AllArgsConstructor;
@@ -28,13 +29,12 @@ public class PersonRepository extends AbstractCrudRepository<Person> {
         return entity.getLastName();
     }
 
-    public Optional<List<Person>> getAllPersonsByAddress(final String address) {
-        return Optional.of(dataManager.getDataContainer()
+    public List<Person> getAllPersonsByAddress(final String address) {
+        return dataManager.getDataContainer()
                 .getPersons()
                 .stream()
                 .filter(p -> p.getAddress().equals(address))
-                .toList()
-        ).filter(list->!list.isEmpty());
+                .toList();
     }
 
     public Optional<List<Person>> getAllPersonsByCity(final String city) {

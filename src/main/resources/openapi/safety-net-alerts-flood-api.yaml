@@ -1,0 +1,90 @@
+openapi: 3.0.3
+info:
+  title: SafetyNetAlerts flood api
+  description: SafetyNetAlerts flood api
+  version: 1.0.0
+servers:
+  - url: "/"
+    description: "Current"
+  - url: "http://localhost:8080"
+    description: "localhost"
+tags:
+  - name: "flood"
+    description: "Everything for safetyNetAlerts about flood"
+paths:
+  /flood:
+    get:
+      summary: Get households grouped by station number
+      description: Returns a list of households for each fire station number provided. Each household is grouped by address and includes residents with personal and medical info.
+      tags:
+        - flood
+      operationId: getResidentsInformationsByStationNumbers
+      parameters:
+        - name: stations
+          in: query
+          description: List of station numbers
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          description: A list of households grouped by station number
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PersonInformationByStationNumber'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: No station found for given numbers
+          content:
+            application/json:
+              schema:
+                type: string
+components:
+  schemas:
+    PersonInformationByStationNumber:
+      type: object
+      properties:
+        stationNumber:
+          type: integer
+        households:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResidentsFloodInformations'
+    ResidentsFloodInformations:
+      type: object
+      properties:
+        address:
+          type: string
+        residents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResidentFloodInformation'
+    ResidentFloodInformation:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phone:
+          type: string
+        age:
+          type: integer
+        medications:
+          type: array
+          items:
+            type: string
+        allergies:
+          type: array
+          items:
+            type: string

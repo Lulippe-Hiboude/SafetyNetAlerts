@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.stream.Collectors;
 
 @Repository
 @AllArgsConstructor
@@ -44,5 +45,11 @@ public class FireStationRepository implements CrudRepository<FireStation> {
         return getDataList().stream()
                 .filter(fireStation -> fireStation.getAddress().equals(address) && fireStation.getStation().equals(station))
                 .findFirst();
+    }
+
+    public List<FireStation> findByStation(String stationNumber) {
+        return getDataList().stream()
+                .filter(fireStation -> fireStation.getStation().equals(stationNumber))
+                .collect(Collectors.toList());
     }
 }
