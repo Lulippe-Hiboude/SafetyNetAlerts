@@ -6,6 +6,7 @@ import com.lulippe.safetynetalerts.exception.entity_exception.InvalidDataExcepti
 import com.lulippe.safetynetalerts.exception.entity_exception.ObjectAlreadyExistsException;
 import com.lulippe.safetynetalerts.model.Person;
 import com.lulippe.safetynetalerts.repository.PersonRepository;
+import org.assertj.core.util.Lists;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -378,15 +379,13 @@ class PersonServiceTest {
         final List<Person> personList = easyRandom.objects(Person.class, 5)
                 .peek(p -> p.setAddress(address))
                 .toList();
-        given(personRepository.getAllPersonsByAddress(address)).willReturn(Optional.of(personList));
+        given(personRepository.getAllPersonsByAddress(address)).willReturn(personList);
 
         //when
-        final Optional<List<Person>> personListExpected = personService.getAllPersonsByAddress(address);
+        final List<Person> personListExpected = personService.getAllPersonsByAddress(address);
 
         //then
-        assertTrue(personListExpected.isPresent());
-        final List<Person> persons = personListExpected.get();
-        assertEquals(persons, personList);
+        assertEquals(personListExpected, personList);
     }
 
     @Test
@@ -395,10 +394,10 @@ class PersonServiceTest {
         //given
         final String address = "1509 Culver St";
 
-        given(personRepository.getAllPersonsByAddress(address)).willReturn(Optional.empty());
+        given(personRepository.getAllPersonsByAddress(address)).willReturn(Collections.emptyList());
 
         //when
-        final Optional<List<Person>> personListExpected = personService.getAllPersonsByAddress(address);
+        final List<Person> personListExpected = personService.getAllPersonsByAddress(address);
 
         //then
         assertTrue(personListExpected.isEmpty());

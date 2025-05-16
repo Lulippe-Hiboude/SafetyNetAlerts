@@ -156,8 +156,7 @@ public class FireStationService {
     }
 
     private List<Person> getAllPersonsByAddress(final String address) {
-        return personService.getAllPersonsByAddress(address)
-                .orElseGet(Collections::emptyList);
+        return personService.getAllPersonsByAddress(address);
     }
 
 
@@ -192,5 +191,14 @@ public class FireStationService {
                     .orElseThrow(() -> new InexistantObjectException("No fireStations found for this station number: " + stationNumber));
         }
         throw new InvalidDataException("Invalid station, please enter a valid number");
+    }
+
+    public List<FireStation> getFireStationByStationNumber(Integer stationNumber) {
+        final List<FireStation> fireStationList = fireStationRepository.findByStation(String.valueOf(stationNumber));
+
+        if (fireStationList.isEmpty()) {
+            throw new InexistantObjectException("No fireStations found for this station number: " + stationNumber);
+        }
+        return fireStationList;
     }
 }

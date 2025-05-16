@@ -82,7 +82,7 @@ class FireServiceTest {
 
         final List<Person> persons = List.of(person);
         given(fireStationService.findFireStationByAddress(address)).willReturn(Optional.of(fireStation));
-        given(personService.getAllPersonsByAddress(address)).willReturn(Optional.of(persons));
+        given(personService.getAllPersonsByAddress(address)).willReturn(persons);
         given(medicalRecordService.getMedicalRecordByFirstNameAndLastName(firstName, lastName)).willReturn(medicalRecord);
 
         //when
@@ -143,7 +143,7 @@ class FireServiceTest {
                 .build();
         final List<Person> persons = List.of(person);
         given(fireStationService.findFireStationByAddress(address)).willReturn(Optional.of(fireStation));
-        given(personService.getAllPersonsByAddress(address)).willReturn(Optional.of(persons));
+        given(personService.getAllPersonsByAddress(address)).willReturn(persons);
         given(medicalRecordService.getMedicalRecordByFirstNameAndLastName("John", "Doe"))
                 .willThrow(new InexistantObjectException("No medical record found"));
 
@@ -202,7 +202,7 @@ class FireServiceTest {
 
         final List<Person> persons = List.of(person);
         given(fireStationService.findFireStationByAddress(address)).willReturn(Optional.of(fireStation));
-        given(personService.getAllPersonsByAddress(address)).willReturn(Optional.of(persons));
+        given(personService.getAllPersonsByAddress(address)).willReturn(persons);
         given(medicalRecordService.getMedicalRecordByFirstNameAndLastName(firstName, lastName)).willReturn(medicalRecord);
 
         //when

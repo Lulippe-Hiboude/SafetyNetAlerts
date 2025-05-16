@@ -81,7 +81,7 @@ public class PersonService {
         deletePersonByFirstNameAndLastName(cleanFirstName, cleanLastName);
     }
 
-    public Optional<List<Person>> getAllPersonsByAddress(final String address) {
+    public List<Person> getAllPersonsByAddress(final String address) {
         return personRepository.getAllPersonsByAddress(address);
     }
 

@@ -9,6 +9,7 @@ import com.lulippe.safetynetalerts.model.FireStation;
 import com.lulippe.safetynetalerts.model.MedicalRecord;
 import com.lulippe.safetynetalerts.model.Person;
 import com.lulippe.safetynetalerts.repository.FireStationRepository;
+import org.assertj.core.util.Lists;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,10 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -350,8 +348,8 @@ class FireStationServiceTest {
         final List<Person> persons2 = new ArrayList<>();
         persons2.add(person3);
         persons2.add(person4);
-        given(personService.getAllPersonsByAddress(address1)).willReturn(Optional.of(persons1));
-        given(personService.getAllPersonsByAddress(address2)).willReturn(Optional.of(persons2));
+        given(personService.getAllPersonsByAddress(address1)).willReturn(persons1);
+        given(personService.getAllPersonsByAddress(address2)).willReturn(persons2);
 
         final MedicalRecord medicalRecord = easyRandom.nextObject(MedicalRecord.class);
 
@@ -420,8 +418,8 @@ class FireStationServiceTest {
         fireStations.add(fireStation1);
         fireStations.add(fireStation2);
         given(fireStationRepository.findAll()).willReturn(fireStations);
-        given(personService.getAllPersonsByAddress(address1)).willReturn(Optional.empty());
-        given(personService.getAllPersonsByAddress(address2)).willReturn(Optional.empty());
+        given(personService.getAllPersonsByAddress(address1)).willReturn(Collections.emptyList());
+        given(personService.getAllPersonsByAddress(address2)).willReturn(Collections.emptyList());
 
         //when
         final FireStationCoverageResponse expectedFireStationCoverageResponse = fireStationService.getResidentsByFireStation(stationNumber);
@@ -431,5 +429,34 @@ class FireStationServiceTest {
         assertEquals(Collections.emptyList(), expectedFireStationCoverageResponse.getResidents());
         assertEquals(0, expectedFireStationCoverageResponse.getChildCount());
         assertEquals(0, expectedFireStationCoverageResponse.getAdultCount());
+    }
+
+    @Test
+    @DisplayName("should return a list of FireStation by stationNumber")
+    void shouldReturnAListOfFireStationByStationNumber() {
+        //given
+        final Integer stationNumber = 3;
+        final FireStation fireStation = easyRandom.nextObject(FireStation.class);
+        final FireStation fireStation2 = easyRandom.nextObject(FireStation.class);
+        final List<FireStation> fireStations = Arrays.asList(fireStation, fireStation2);
+        given(fireStationRepository.findByStation(String.valueOf(stationNumber))).willReturn(fireStations);
+        //when
+
+        final List<FireStation> expectedFireStations = fireStationService.getFireStationByStationNumber(stationNumber);
+
+        //then
+        assertNotNull(expectedFireStations);
+        assertEquals(expectedFireStations, fireStations);
+    }
+
+    @Test
+    @DisplayName("should throw InexistantObjectException if no FireStation found by stationNumber")
+    void shouldThrowInexistantObjectExceptionIfNoFireStationFoundByStationNumber() {
+        //given
+        final Integer stationNumber = 3;
+        given(fireStationRepository.findByStation(String.valueOf(stationNumber))).willReturn(Collections.emptyList());
+
+        //when & then
+        assertThrows(InexistantObjectException.class, () -> fireStationService.getFireStationByStationNumber(stationNumber));
     }
 }
