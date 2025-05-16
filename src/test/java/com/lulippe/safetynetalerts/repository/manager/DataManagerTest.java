@@ -46,7 +46,7 @@ class DataManagerTest {
                         List.of("aznol:350mg", "hydrapermazol:100mg"), List.of("nillacilan"))
         ));
 
-        assertEquals(1, dataContainer.getPersons().size());
+        assertEquals(2, dataContainer.getPersons().size());
         assertEquals("Johnny", dataContainer.getPersons().getFirst().getFirstName());
         assertEquals("Boyd", dataContainer.getPersons().getFirst().getLastName());
         assertEquals("1509 Culver St", dataContainer.getPersons().getFirst().getAddress());
@@ -88,7 +88,7 @@ class DataManagerTest {
 
         //then
         assertNotNull(dataManager);
-        assertEquals(1, dataManager.getDataContainer().getPersons().size());
+        assertEquals(2, dataManager.getDataContainer().getPersons().size());
         assertEquals("Johnny", dataManager.getDataContainer().getPersons().getFirst().getFirstName());
         assertEquals("Boyd", dataManager.getDataContainer().getPersons().getFirst().getLastName());
         assertEquals("1509 Culver St", dataManager.getDataContainer().getPersons().getFirst().getAddress());

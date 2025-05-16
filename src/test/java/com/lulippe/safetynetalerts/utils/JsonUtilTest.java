@@ -29,7 +29,7 @@ class JsonUtilTest {
 
         //then
         assertNotNull(dataContainer);
-        assertEquals(1, dataContainer.getPersons().size());
+        assertEquals(2, dataContainer.getPersons().size());
         assertEquals("Johnny", dataContainer.getPersons().getFirst().getFirstName());
         assertEquals(1, dataContainer.getFireStations().size());
         assertEquals("1509 Culver St", dataContainer.getFireStations().getFirst().getAddress());

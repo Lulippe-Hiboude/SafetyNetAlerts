@@ -186,6 +186,34 @@ class PersonRepositoryTest {
         assertTrue(personList.isEmpty());
     }
 
+    @Test
+    @DisplayName("should return a list of person by lastName")
+    void shouldReturnAListOfPersonByLastName() {
+        //given
+        DataContainer dataContainer = initializeDataContainer();
+        given(dataManager.getDataContainer()).willReturn(dataContainer);
+
+        //when
+        final Optional<List<Person>> personList = personRepository.getAllPersonsByLastName("Doe");
+
+        //then
+        assertTrue(personList.isPresent());
+        List<Person> persons = personList.get();
+        assertEquals(1, persons.size());
+    }
+
+    @Test
+    @DisplayName("should return optionalEmpty if no person found for a given last name")
+    void shouldReturnAnOptionalEmptyIfNoPersonFoundForGivenLastName() {
+        //given
+        final String lastName = "lastName";
+        DataContainer dataContainer = initializeDataContainer();
+        given(dataManager.getDataContainer()).willReturn(dataContainer);
+
+        //when
+        final Optional<List<Person>> personList = personRepository.getAllPersonsByLastName("Doe");
+    }
+
     private DataContainer initializeDataContainer() {
         Person person = new Person();
         person.setFirstName("John");

@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: SafetyNetAlerts PersonInfoLastName api
+  description: SafetyNetAlerts PersonInfoLastName api
+  version: 1.0.0
+servers:
+  - url: "/"
+    description: "Current"
+  - url: "http://localhost:8080"
+    description: "localhost"
+tags:
+  - name: "personInfoLastName"
+    description: "Everything for safetyNetAlerts about PersonInfoLastName"
+paths:
+  /personInfoLastName:
+    get:
+      tags:
+        - "personInfoLastName"
+      summary: "List of resident sharing the same name with their personal informations"
+      operationId: getPersonInfoLastName
+      parameters:
+        - in: query
+          name: lastName
+          required: true
+          schema:
+            type: string
+            description: "the lastName being queried"
+      responses:
+        '200':
+          description: "a list of person with their personal informations sharing the same lastName"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResidentInformation'
+                description: "a list of person with their personal informations sharing the same lastName"
+                example:
+                  residents:
+                    - firstName: "John"
+                      address: "123 Elm St"
+                      age: 41
+                      email: "john.doe@example.com"
+                      medication: [ "aznol:350mg" ]
+                      allergies: [ "pollen" ]
+                    - firstName: "Jane"
+                      address: "456 Oak St"
+                      age: 37
+                      email: "jane.doe@example.com"
+                      medication: [ ]
+                      allergies: [ "peanut" ]
+        '400':
+          description: "Invalid input"
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: "Not found - no resident found for the given lastName"
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  schemas:
+    ResidentInformation:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: "the firstName of the person"
+        address:
+          type: string
+          description: "the address of the person"
+        age:
+          type: integer
+          description: "the age of the person"
+        email:
+          type: string
+          description: "the email of the person"
+        medications:
+          type: array
+          description: "the list of all the treatments taken by the patient and their dosage"
+          example: [ "aznol:350mg", "ibuprofen:200mg" ]
+          nullable: false
+          items:
+            type: string
+            description: "the name and the prescribed dose of the medicine"
+            example: "aznol:350mg"
+        allergies:
+          type: array
+          description: "the list of all allergies the patient suffers from"
+          example: [ "pollen", "dust" ]
+          nullable: false
+          items:
+            type: string
+            description: "the name of the allergen"
+            example: "nillacilan"
+
+
+
+
