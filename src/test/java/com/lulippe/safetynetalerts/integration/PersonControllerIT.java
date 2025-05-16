@@ -54,7 +54,7 @@ class PersonControllerIT {
                 .build();
 
         DataContainer initialDataContainer = dataManager.getDataContainer();
-        assertEquals(1, initialDataContainer.getPersons().size());
+        assertEquals(2, initialDataContainer.getPersons().size());
         assertFalse(initialDataContainer.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals("Jane") && person.getLastName().equals("Doe")));
 
@@ -65,7 +65,7 @@ class PersonControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Person create successfully : " + personCreateDto));
         DataContainer updatedData = dataManager.getDataContainer();
-        assertEquals(2, updatedData.getPersons().size());
+        assertEquals(3, updatedData.getPersons().size());
         assertTrue(updatedData.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals("Jane") && person.getLastName().equals("Doe")));
     }
@@ -84,7 +84,7 @@ class PersonControllerIT {
                 .email("jaboyd@email.com")
                 .build();
         DataContainer initialDataContainer = dataManager.getDataContainer();
-        assertEquals(1, initialDataContainer.getPersons().size());
+        assertEquals(2, initialDataContainer.getPersons().size());
         assertTrue(initialDataContainer.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals("Johnny") && person.getLastName().equals("Boyd")));
 
@@ -95,7 +95,7 @@ class PersonControllerIT {
                 .andExpect(status().isConflict())
                 .andExpect(MockMvcResultMatchers.content().string("Person already exists"));
         DataContainer updatedData = dataManager.getDataContainer();
-        assertEquals(1, updatedData.getPersons().size());
+        assertEquals(2, updatedData.getPersons().size());
         assertTrue(updatedData.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals("Johnny") && person.getLastName().equals("Boyd")));
     }
@@ -115,7 +115,7 @@ class PersonControllerIT {
                 .build();
 
         DataContainer initialDataContainer = dataManager.getDataContainer();
-        assertEquals(1, initialDataContainer.getPersons().size());
+        assertEquals(2, initialDataContainer.getPersons().size());
         assertTrue(initialDataContainer.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals("Johnny") && person.getLastName().equals("Boyd")));
 
@@ -126,7 +126,7 @@ class PersonControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().string("firstName or LastName is blank: " + personCreateDto.getFirstName() + ", " + personCreateDto.getLastName()));
         DataContainer updatedData = dataManager.getDataContainer();
-        assertEquals(1, updatedData.getPersons().size());
+        assertEquals(2, updatedData.getPersons().size());
         assertTrue(updatedData.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals("Johnny") && person.getLastName().equals("Boyd")));
     }
@@ -136,7 +136,7 @@ class PersonControllerIT {
     void shouldReturnBadRequestWhenPersonCreateDtoHasNullValues() throws Exception {
         //given
         DataContainer initialDataContainer = dataManager.getDataContainer();
-        assertEquals(1, initialDataContainer.getPersons().size());
+        assertEquals(2, initialDataContainer.getPersons().size());
         assertTrue(initialDataContainer.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals("Johnny") && person.getLastName().equals("Boyd")));
 
@@ -170,7 +170,7 @@ class PersonControllerIT {
                         .build();
 
         DataContainer initialDataContainer = dataManager.getDataContainer();
-        assertEquals(1, initialDataContainer.getPersons().size());
+        assertEquals(2, initialDataContainer.getPersons().size());
         assertFalse(initialDataContainer.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals("Jane") && person.getLastName().equals("Doe")));
 
@@ -180,7 +180,7 @@ class PersonControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Person create successfully : " + personCreateDto));
         DataContainer updatedData = dataManager.getDataContainer();
-        assertEquals(2, updatedData.getPersons().size());
+        assertEquals(3, updatedData.getPersons().size());
         assertTrue(updatedData.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals("Jane") && person.getLastName().equals("Doe")));
 
@@ -191,7 +191,7 @@ class PersonControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Person update successfully : " + personUpdateDto));
         DataContainer updatedData2 = dataManager.getDataContainer();
-        assertEquals(2, updatedData2.getPersons().size());
+        assertEquals(3, updatedData2.getPersons().size());
 
         Person updatedPerson = updatedData2.getPersons().stream()
                 .filter(person -> person.getFirstName().equals("Jane") && person.getLastName().equals("Doe"))
@@ -218,7 +218,7 @@ class PersonControllerIT {
                 .build();
 
         DataContainer initialDataContainer = dataManager.getDataContainer();
-        assertEquals(1, initialDataContainer.getPersons().size());
+        assertEquals(2, initialDataContainer.getPersons().size());
         assertTrue(initialDataContainer.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals("Johnny") && person.getLastName().equals("Boyd")));
 
@@ -229,7 +229,7 @@ class PersonControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().string("firstName or LastName is blank: " + personUpdateDto.getFirstName() + ", " + personUpdateDto.getLastName()));
         DataContainer updatedData = dataManager.getDataContainer();
-        assertEquals(1, updatedData.getPersons().size());
+        assertEquals(2, updatedData.getPersons().size());
         assertTrue(updatedData.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals("Johnny") && person.getLastName().equals("Boyd")));
     }
@@ -245,7 +245,7 @@ class PersonControllerIT {
                         .zip("69498")
                         .build();
         DataContainer initialDataContainer = dataManager.getDataContainer();
-        assertEquals(1, initialDataContainer.getPersons().size());
+        assertEquals(2, initialDataContainer.getPersons().size());
         assertTrue(initialDataContainer.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals("Johnny") && person.getLastName().equals("Boyd")));
 
@@ -264,7 +264,7 @@ class PersonControllerIT {
         final String firstName = "Johnny";
         final String lastName = "Boyd";
         DataContainer initialDataContainer = dataManager.getDataContainer();
-        assertEquals(1, initialDataContainer.getPersons().size());
+        assertEquals(2, initialDataContainer.getPersons().size());
         assertTrue(initialDataContainer.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)));
 
@@ -277,7 +277,7 @@ class PersonControllerIT {
                 .andExpect(MockMvcResultMatchers.content().string("Person with firstName " + firstName
                         + " and lastName " + lastName + ", delete successfully."));
         DataContainer updatedData = dataManager.getDataContainer();
-        assertEquals(0, updatedData.getPersons().size());
+        assertEquals(1, updatedData.getPersons().size());
     }
 
     @Test
@@ -287,7 +287,7 @@ class PersonControllerIT {
         final String firstName = "Jane";
         final String lastName = "Doe";
         DataContainer initialDataContainer = dataManager.getDataContainer();
-        assertEquals(1, initialDataContainer.getPersons().size());
+        assertEquals(2, initialDataContainer.getPersons().size());
         assertFalse(initialDataContainer.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)));
 
@@ -299,7 +299,7 @@ class PersonControllerIT {
                 .andExpect(status().isNotFound())
                 .andExpect(MockMvcResultMatchers.content().string("Person with firstName " + firstName + " and lastName " + lastName + " does not exist"));
         DataContainer updatedData = dataManager.getDataContainer();
-        assertEquals(1, updatedData.getPersons().size());
+        assertEquals(2, updatedData.getPersons().size());
     }
 
     @Test
@@ -309,7 +309,7 @@ class PersonControllerIT {
         final String firstName = "Jane";
         final String lastName = " ";
         DataContainer initialDataContainer = dataManager.getDataContainer();
-        assertEquals(1, initialDataContainer.getPersons().size());
+        assertEquals(2, initialDataContainer.getPersons().size());
         assertFalse(initialDataContainer.getPersons().stream()
                 .anyMatch(person -> person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)));
 

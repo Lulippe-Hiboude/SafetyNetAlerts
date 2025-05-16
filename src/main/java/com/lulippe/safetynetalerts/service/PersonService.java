@@ -159,4 +159,9 @@ public class PersonService {
                 })
                 .collect(Collectors.toSet());
     }
+
+    public List<Person> getAllPersonsByLastName(final String lastName) {
+        return personRepository.getAllPersonsByLastName(lastName)
+                .orElseThrow(() -> new InexistantObjectException("No Person found for this last name: " + lastName));
+    }
 }

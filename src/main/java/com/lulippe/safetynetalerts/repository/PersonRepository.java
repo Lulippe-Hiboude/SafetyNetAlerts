@@ -46,4 +46,14 @@ public class PersonRepository extends AbstractCrudRepository<Person> {
                         .toList()
         ).filter(list -> !list.isEmpty());
     }
+
+    public Optional<List<Person>> getAllPersonsByLastName(String lastName) {
+        return Optional.of(
+                dataManager.getDataContainer()
+                        .getPersons()
+                        .stream()
+                        .filter(p -> p.getLastName().equals(lastName))
+                        .toList()
+        ).filter(list -> !list.isEmpty());
+    }
 }
