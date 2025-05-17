@@ -427,6 +427,32 @@
                            </additionalProperties>
                        </configuration>
                    </execution>
+                   <execution>
+                       <id>PhoneAlert</id>
+                       <goals>
+                           <goal>generate</goal>
+                       </goals>
+                       <configuration>
+                           <inputSpec>${project.basedir}/src/main/resources/openapi/safety-net-alerts-phoneAlert-api.yaml</inputSpec>
+                           <apiPackage>com.lulippe.safetynetalerts.phoneAlert.api</apiPackage>
+                           <modelPackage>com.lulippe.safetynetalerts.phoneAlert.model</modelPackage>
+                           <generatorName>spring</generatorName>
+                           <generateModelTests>true</generateModelTests>
+                           <generateModelDocumentation>true</generateModelDocumentation>
+                           <generateApiTests>true</generateApiTests>
+                           <generateSupportingFiles>false</generateSupportingFiles>
+                           <configOptions>
+                               <useTags>true</useTags>
+                               <useSpringBoot3>true</useSpringBoot3>
+                               <skipDefaultInterface>true</skipDefaultInterface>
+                               <interfaceOnly>true</interfaceOnly>
+                               <returnResponse>true</returnResponse>
+                           </configOptions>
+                           <additionalProperties>
+                               <additionalProperty>removeEnumValuePrefix=false</additionalProperty>
+                           </additionalProperties>
+                       </configuration>
+                   </execution>
                </executions>
            </plugin>
        </plugins>

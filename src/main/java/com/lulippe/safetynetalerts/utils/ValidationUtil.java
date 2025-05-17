@@ -38,4 +38,11 @@ public class ValidationUtil {
         return data.trim();
     }
 
+    public static void validateStationNumber(Integer number) {
+        if (number == null || number <= 0) {
+            log.error("Invalid stations number");
+            throw new InvalidDataException("Invalid stations number");
+        }
+    }
+
 }

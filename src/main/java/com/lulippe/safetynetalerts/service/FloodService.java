@@ -7,6 +7,7 @@ import com.lulippe.safetynetalerts.flood.model.ResidentsFloodInformations;
 import com.lulippe.safetynetalerts.mapper.ResidentFloodInformationMapper;
 import com.lulippe.safetynetalerts.model.FireStation;
 import com.lulippe.safetynetalerts.model.MedicalRecord;
+import com.lulippe.safetynetalerts.utils.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class FloodService {
                     return new InvalidDataException("Invalid stations number list");
                 })
                 .stream()
-                .peek(this::validateStationNumber)
+                .peek(ValidationUtil::validateStationNumber)
                 .map(this::getPersonInformationByStationNumber)
                 .toList();
     }
@@ -55,10 +56,4 @@ public class FloodService {
         return ResidentFloodInformationMapper.INSTANCE.toResidentsFloodInformations(fireStation.getAddress(), residentFloodInformationList);
     }
 
-    private void validateStationNumber(Integer number) {
-        if (number == null || number <= 0) {
-            log.error("Invalid stations number");
-            throw new InvalidDataException("Invalid stations number");
-        }
-    }
 }

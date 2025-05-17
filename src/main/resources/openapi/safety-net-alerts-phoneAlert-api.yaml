@@ -1,0 +1,62 @@
+openapi: 3.0.3
+info:
+  title: SafetyNetAlerts phoneAlert api
+  description: SafetyNetAlerts phoneAlert api
+  version: 1.0.0
+servers:
+  - url: "/"
+    description: "Current"
+  - url: "http://localhost:8080"
+    description: "localhost"
+tags:
+  - name: "phoneAlert"
+    description: "Everything for safetyNetAlerts about phoneAlert"
+paths:
+  /phoneAlert:
+    get:
+      tags:
+        - "phoneAlert"
+      summary: "List of phone numbers of residents covered by the fire station."
+      operationId: getPhoneAlertResponse
+      parameters:
+        - in: query
+          name: firestation
+          required: true
+          schema:
+            type: integer
+            description: "the station number being queried"
+      responses:
+        '200':
+          description: "a list of phone number of residents covered by the fire station"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PhoneAlertResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: No station found for given firestation
+          content:
+            application/json:
+              schema:
+                type: string
+components:
+  schemas:
+    PhoneAlertResponse:
+      type: object
+      properties:
+        stationNumber:
+          type: integer
+          description: "the station number being queried"
+        phoneNumbers:
+          type: array
+          items:
+            type: string
+            example: "562-469-523"
+  
