@@ -12,7 +12,6 @@ import com.lulippe.safetynetalerts.model.FireStation;
 import com.lulippe.safetynetalerts.model.MedicalRecord;
 import com.lulippe.safetynetalerts.model.Person;
 import com.lulippe.safetynetalerts.repository.FireStationRepository;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

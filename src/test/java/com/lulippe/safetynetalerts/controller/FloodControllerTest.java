@@ -31,6 +31,7 @@ class FloodControllerTest {
 
     @MockitoBean
     private FloodService floodService;
+
     private final EasyRandom easyRandom = new EasyRandom();
 
     @Test

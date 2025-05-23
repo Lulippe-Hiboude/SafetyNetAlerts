@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateStationNumber;
 
@@ -28,10 +30,13 @@ public class PhoneAlertService {
     }
 
     private PhoneAlertResponse getPersonsPhone(final FireStation fireStation) {
-        final List<String> personsPhone = personService.getAllPersonsByAddress(fireStation.getAddress())
+        final Set<String> personsPhone = personService.getAllPersonsByAddress(fireStation.getAddress())
                 .stream()
                 .map(Person::getPhone)
-                .toList();
-        return  PhoneAlertResponseMapper.INSTANCE.toPhoneAlertResponse(Integer.parseInt(fireStation.getStation()),personsPhone);
+                .collect(Collectors.toSet());
+
+        final List<String> personsPhoneList = personsPhone.stream().toList();
+
+        return  PhoneAlertResponseMapper.INSTANCE.toPhoneAlertResponse(Integer.parseInt(fireStation.getStation()),personsPhoneList);
     }
 }

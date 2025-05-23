@@ -214,6 +214,7 @@
                        <exclude>com/lulippe/safetynetalerts/personInfoLastName/**</exclude>
                        <exclude>com/lulippe/safetynetalerts/childAlert/**</exclude>
                        <exclude>com/lulippe/safetynetalerts/flood/**</exclude>
+                       <exclude>com/lulippe/safetynetalerts/phoneAlert/**</exclude>
                    </excludes>
                </configuration>
                <executions>

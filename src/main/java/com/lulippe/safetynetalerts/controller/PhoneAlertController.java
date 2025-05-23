@@ -21,6 +21,7 @@ public class PhoneAlertController implements PhoneAlertApi {
     public ResponseEntity<List<PhoneAlertResponse>> getPhoneAlertResponse(Integer firestation) {
         log.info("getting phone numbers of resident covered by station {}", firestation);
         final List<PhoneAlertResponse> phoneAlertResponses = phoneAlertService.getPhoneAlertResponse(firestation);
+        log.info("phone numbers of resident covered by station {} retrieved successfully", firestation);
         return ResponseEntity.ok(phoneAlertResponses);
     }
 }
