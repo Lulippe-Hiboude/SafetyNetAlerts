@@ -23,7 +23,6 @@ import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateLastNameA
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
-@Data
 @Service
 public class PersonService {
     private final PersonRepository personRepository;

@@ -32,7 +32,6 @@ import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
-@Data
 @Service
 public class FireStationService {
     public static final String STATION_NUMBER = "station number";

@@ -212,6 +212,8 @@
                        <exclude>com/lulippe/safetynetalerts/medicalRecord/**</exclude>
                        <exclude>com/lulippe/safetynetalerts/communityEmail/**</exclude>
                        <exclude>com/lulippe/safetynetalerts/personInfoLastName/**</exclude>
+                       <exclude>com/lulippe/safetynetalerts/childAlert/**</exclude>
+                       <exclude>com/lulippe/safetynetalerts/flood/**</exclude>
                    </excludes>
                </configuration>
                <executions>
@@ -397,6 +399,32 @@
                        <additionalProperties>
                            <additionalProperty>removeEnumValuePrefix=false</additionalProperty>
                        </additionalProperties>
+                       </configuration>
+                   </execution>
+                   <execution>
+                       <id>ChildAlert</id>
+                       <goals>
+                           <goal>generate</goal>
+                       </goals>
+                       <configuration>
+                           <inputSpec>${project.basedir}/src/main/resources/openapi/safety-net-alerts-childAlert-api.yaml</inputSpec>
+                           <apiPackage>com.lulippe.safetynetalerts.childAlert.api</apiPackage>
+                           <modelPackage>com.lulippe.safetynetalerts.childAlert.model</modelPackage>
+                           <generatorName>spring</generatorName>
+                           <generateModelTests>true</generateModelTests>
+                           <generateModelDocumentation>true</generateModelDocumentation>
+                           <generateApiTests>true</generateApiTests>
+                           <generateSupportingFiles>false</generateSupportingFiles>
+                           <configOptions>
+                               <useTags>true</useTags>
+                               <useSpringBoot3>true</useSpringBoot3>
+                               <skipDefaultInterface>true</skipDefaultInterface>
+                               <interfaceOnly>true</interfaceOnly>
+                               <returnResponse>true</returnResponse>
+                           </configOptions>
+                           <additionalProperties>
+                               <additionalProperty>removeEnumValuePrefix=false</additionalProperty>
+                           </additionalProperties>
                        </configuration>
                    </execution>
                </executions>

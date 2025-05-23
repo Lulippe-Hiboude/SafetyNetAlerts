@@ -17,7 +17,7 @@ public class FloodController implements FloodApi {
     private final FloodService floodService;
 
     @Override
-    public ResponseEntity<List<PersonInformationByStationNumber>> getResidentsInformationsByStationNumbers(List<Integer> stations) {
+    public ResponseEntity<List<PersonInformationByStationNumber>> getResidentsInformationsByStationNumbers(final List<Integer> stations) {
         log.info("getting persons informations by stations");
         final List<PersonInformationByStationNumber> personInformationByStationNumbersList = floodService.getResidentsInformationsByStationNumbers(stations);
         return ResponseEntity.ok(personInformationByStationNumbersList);

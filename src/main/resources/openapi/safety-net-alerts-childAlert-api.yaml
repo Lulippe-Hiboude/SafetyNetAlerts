@@ -1,0 +1,80 @@
+openapi: 3.0.3
+info:
+  title: SafetyNetAlerts ChildAlert api
+  description: SafetyNetAlerts ChildAlert api
+  version: 1.0.0
+servers:
+  - url: "/"
+    description: "Current"
+  - url: "http://localhost:8080"
+    description: "localhost"
+tags:
+  - name: "childAlert"
+    description: "Everything for safetyNetAlerts about childAlert"
+paths:
+  /childAlert:
+    get:
+      tags:
+        - "Child Alert"
+      summary: "List of all children living at a given address, including the other household members"
+      operationId: getChildAlertResponse
+      parameters:
+        - in: query
+          name: address
+          required: true
+          schema:
+            type: string
+            description: "the address being queried"
+      responses:
+        '200':
+          description: "children found at the given address and the other household members for each child"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChildAlertResponse'
+        '400':
+          description: "Invalid input"
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: "Not found - no person found for the given address"
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  schemas:
+    ChildAlertResponse:
+      type: object
+      properties:
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChildInformation'
+    ChildInformation:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Boyd"
+        age:
+          type: integer
+          example: 6
+        householdMembers:
+          type: array
+          items:
+            $ref: '#/components/schemas/HouseholdMember'
+    HouseholdMember:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Boyd"

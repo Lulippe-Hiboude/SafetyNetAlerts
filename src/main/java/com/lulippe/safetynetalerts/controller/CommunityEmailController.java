@@ -15,7 +15,7 @@ public class CommunityEmailController implements CommunityEmailApi {
     private final CommunityEmailService communityEmailService;
 
     @Override
-    public ResponseEntity<CommunityEmailList> getCommunityEmail(String city) {
+    public ResponseEntity<CommunityEmailList> getCommunityEmail(final String city) {
         log.info("getting CommunityEmailList for city {}", city);
         return ResponseEntity.ok(communityEmailService.getCommunityEmailList(city));
     }
