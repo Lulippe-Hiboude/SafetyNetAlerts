@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.lulippe.safetynetalerts.model.enums.DataNameEnum.*;
 import static com.lulippe.safetynetalerts.utils.LogUtil.logFireStationNumberInvalid;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.normalizeAndValidate;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateStringsData;
@@ -33,15 +34,12 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 @Service
 public class FireStationService {
-    public static final String STATION_NUMBER = "station number";
     private final FireStationRepository fireStationRepository;
-    final static String FIRE_STATION_ADDRESS = "fireStation address";
-    final static String FIRE_STATION_NUMBER = "fireStation number";
     private final PersonService personService;
     private final MedicalRecordService medicalRecordService;
 
     public FireStationCoverageResponse getResidentsByFireStation(final String stationNumber) {
-        final String cleanStationNumber = normalizeAndValidate(stationNumber, STATION_NUMBER);
+        final String cleanStationNumber = normalizeAndValidate(stationNumber, STATION_NUMBER.getValue());
         final List<FireStation> fireStations = getFireStation(stationNumber, cleanStationNumber);
         final List<Person> personsCoveredByFireStation = fireStations.stream()
                 .flatMap(fireStation -> getAllPersonsByAddress(fireStation.getAddress())
@@ -58,7 +56,7 @@ public class FireStationService {
 
     public void handleFireStationCreationRequest(final FireStationDto fireStationCreateDto) {
         validateStringsData(fireStationCreateDto.getAddress(), fireStationCreateDto.getStation(),
-                FIRE_STATION_ADDRESS, FIRE_STATION_NUMBER);
+                FIRE_STATION_ADDRESS.getValue(), FIRE_STATION_NUMBER.getValue());
         cleanDto(fireStationCreateDto);
         validateCreationData(fireStationCreateDto);
         createFireStation(fireStationCreateDto);
@@ -66,7 +64,7 @@ public class FireStationService {
 
     public void handleFireStationUpdateRequest(final FireStationDto fireStationUpdateDto) {
         validateStringsData(fireStationUpdateDto.getAddress(), fireStationUpdateDto.getStation(),
-                FIRE_STATION_ADDRESS, FIRE_STATION_NUMBER);
+                FIRE_STATION_ADDRESS.getValue(), FIRE_STATION_NUMBER.getValue());
         cleanDto(fireStationUpdateDto);
         FireStation existingFireStation = getExistingFireStationForUpdate(fireStationUpdateDto);
         updateFireStation(fireStationUpdateDto, existingFireStation);
@@ -74,7 +72,7 @@ public class FireStationService {
 
     public void handleFireStationDeleteRequest(final FireStationDto fireStationDeleteDto) {
         validateStringsData(fireStationDeleteDto.getAddress(), fireStationDeleteDto.getStation(),
-                FIRE_STATION_ADDRESS, FIRE_STATION_NUMBER);
+                FIRE_STATION_ADDRESS.getValue(), FIRE_STATION_NUMBER.getValue());
         cleanDto(fireStationDeleteDto);
         FireStation existingFireStation = getExistingFireStationForDelete(fireStationDeleteDto);
         deleteFireStation(existingFireStation);

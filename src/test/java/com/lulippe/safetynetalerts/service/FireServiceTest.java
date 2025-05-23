@@ -42,8 +42,6 @@ class FireServiceTest {
     @Mock
     private MedicalRecordService medicalRecordService;
 
-    private final EasyRandom easyRandom= new EasyRandom();
-
     @Test
     @DisplayName("should return a FireAddressResponse for a given address")
     void shouldReturnFireAddressResponseForGivenAddress() {
@@ -72,10 +70,11 @@ class FireServiceTest {
         medications.add("aznol:350mg");
         final List<String> allergies = new ArrayList<>();
         allergies.add("dust");
+        String birthdate = "03/06/1984";
         final MedicalRecord medicalRecord = MedicalRecord.builder()
                 .firstName(firstName)
                 .lastName(lastName)
-                .birthdate("03/06/1984")
+                .birthdate(birthdate)
                 .medications(medications)
                 .allergies(allergies)
                 .build();
@@ -84,6 +83,7 @@ class FireServiceTest {
         given(fireStationService.findFireStationByAddress(address)).willReturn(Optional.of(fireStation));
         given(personService.getAllPersonsByAddress(address)).willReturn(persons);
         given(medicalRecordService.getMedicalRecordByFirstNameAndLastName(firstName, lastName)).willReturn(medicalRecord);
+        given(medicalRecordService.calculatePersonAge(birthdate)).willReturn(41);
 
         //when
         final FireAddressResponse fireAddressResponse = fireService.handleFireRequest(address);
@@ -97,10 +97,7 @@ class FireServiceTest {
         assertEquals(firstName, resident.getFirstName());
         assertEquals(lastName, resident.getLastName());
         assertEquals(person.getPhone(), resident.getPhone());
-        assertEquals(Years.yearsBetween(
-                DateTimeFormat.forPattern("MM/dd/yyyy").parseDateTime(medicalRecord.getBirthdate()),
-                DateTime.now()
-        ).getYears(), resident.getAge());
+        assertEquals(41, resident.getAge());
 
         assertEquals(medications, resident.getMedications());
         assertEquals(allergies, resident.getAllergies());
@@ -163,51 +160,4 @@ class FireServiceTest {
         verify(personService,times(0)).getAllPersonsByAddress(address);
         verify(medicalRecordService,times(0)).getMedicalRecordByFirstNameAndLastName(any(),any());
     }
-
-    @Test
-    @DisplayName("should throw InvalidDataException if birthdate is null or blank")
-    void shouldThrowInvalidDataExceptionIfBirthdateIsNullOrBlank() {
-        //given
-        final String address = "1509 Culver St";
-        final String stationNumber = "3";
-        final FireStation fireStation = FireStation.builder()
-                .address(address)
-                .station(stationNumber)
-                .build();
-
-        final String firstName = "John";
-        final String lastName = "Doe";
-        final Person person = Person.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .address(address)
-                .zip("97451")
-                .email("j.doe@email.com")
-                .city("Culver")
-                .phone("123456789")
-                .build();
-
-        final List<String> medications = new ArrayList<>();
-        medications.add("paracetamol : 1000mg");
-        medications.add("aznol:350mg");
-        final List<String> allergies = new ArrayList<>();
-        allergies.add("dust");
-        final MedicalRecord medicalRecord = MedicalRecord.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .birthdate(null)
-                .medications(medications)
-                .allergies(allergies)
-                .build();
-
-        final List<Person> persons = List.of(person);
-        given(fireStationService.findFireStationByAddress(address)).willReturn(Optional.of(fireStation));
-        given(personService.getAllPersonsByAddress(address)).willReturn(persons);
-        given(medicalRecordService.getMedicalRecordByFirstNameAndLastName(firstName, lastName)).willReturn(medicalRecord);
-
-        //when
-        assertThrows(InvalidDataException.class , () -> fireService.handleFireRequest(address));
-    }
-
-
 }

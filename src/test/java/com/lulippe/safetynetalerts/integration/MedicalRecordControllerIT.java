@@ -133,7 +133,7 @@ public class MedicalRecordControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newMedicalRecordDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("firstName or LastName is blank: " + newMedicalRecordDto.getFirstName() + ", " + newMedicalRecordDto.getLastName()));
+                .andExpect(MockMvcResultMatchers.content().string("first name or last name is blank: " + newMedicalRecordDto.getFirstName() + ", " + newMedicalRecordDto.getLastName()));
         DataContainer updatedData = dataManager.getDataContainer();
         assertEquals(1, updatedData.getMedicalRecords().size());
         assertTrue(updatedData.getMedicalRecords().stream()
@@ -638,6 +638,6 @@ public class MedicalRecordControllerIT {
                         .param("lastName", lastName)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("firstName or LastName is blank: " + lastName + ", " + firstName));
+                .andExpect(MockMvcResultMatchers.content().string("first name or last name is blank: " + firstName+ ", " + lastName));
     }
 }

@@ -7,6 +7,7 @@ import com.lulippe.safetynetalerts.mapper.FireMapper;
 import com.lulippe.safetynetalerts.model.FireStation;
 import com.lulippe.safetynetalerts.model.MedicalRecord;
 import com.lulippe.safetynetalerts.model.Person;
+import com.lulippe.safetynetalerts.model.enums.DataNameEnum;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.lulippe.safetynetalerts.model.enums.DataNameEnum.ADDRESS;
+import static com.lulippe.safetynetalerts.model.enums.DataNameEnum.BIRTHDATE;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.normalizeAndValidate;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateData;
 
@@ -31,11 +34,9 @@ public class FireService {
     private final FireStationService fireStationService;
     private final PersonService personService;
     private final MedicalRecordService medicalRecordService;
-    private static final String ADDRESS = "address";
-    static final String BIRTHDATE = "birthdate";
 
     public FireAddressResponse handleFireRequest(final String address) {
-        final String cleanAddress = normalizeAndValidate(address, ADDRESS);
+        final String cleanAddress = normalizeAndValidate(address, ADDRESS.getValue());
 
         final FireStation existingfireStation = getFireStation(cleanAddress);
         final List<Person> personList = getPersonListByAddress(cleanAddress);
@@ -54,20 +55,11 @@ public class FireService {
     private void createFireResidentList(List<Person> personList, List<FireResident> residents) {
         personList.forEach(person -> {
             final MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFirstNameAndLastName(person.getFirstName(), person.getLastName());
-            final int personAge = calculatePersonAge(medicalRecord.getBirthdate());
+            final int personAge = medicalRecordService.calculatePersonAge(medicalRecord.getBirthdate());
             final FireResident fireResident = FireMapper.INSTANCE.toFireResident(person.getFirstName(), person.getLastName(), person.getPhone(), personAge,
                     medicalRecord.getMedications(), medicalRecord.getAllergies());
             residents.add(fireResident);
         });
-    }
-
-    private int calculatePersonAge(final String birthdate) {
-        validateData(birthdate, BIRTHDATE);
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("MM/dd/yyyy");
-        DateTime birth = formatter.parseDateTime(birthdate);
-        DateTime now = DateTime.now();
-        Years age = Years.yearsBetween(birth, now);
-        return age.getYears();
     }
 
     private List<Person> getPersonListByAddress(final String cleanAddress) {

@@ -14,18 +14,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.lulippe.safetynetalerts.model.enums.DataNameEnum.ADDRESS;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.normalizeAndValidate;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 @Service
 public class ChildAlertService {
-    public static final String ADDRESS = "address";
     private final MedicalRecordService medicalRecordService;
     private final PersonService personService;
 
     public ChildAlertResponse getChildAlertResponse(final String address) {
-        normalizeAndValidate(address, ADDRESS);
+        normalizeAndValidate(address, ADDRESS.getValue());
         final List<Person> persons = personService.getAllPersonsByAddress(address);
         if (persons.isEmpty()) {
             log.error("No persons found for address {}", address);

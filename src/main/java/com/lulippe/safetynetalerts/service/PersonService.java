@@ -6,7 +6,6 @@ import com.lulippe.safetynetalerts.exception.entity_exception.ObjectAlreadyExist
 import com.lulippe.safetynetalerts.mapper.PersonMapper;
 import com.lulippe.safetynetalerts.model.Person;
 import com.lulippe.safetynetalerts.repository.PersonRepository;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
@@ -18,8 +17,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.lulippe.safetynetalerts.model.enums.DataNameEnum.FIRST_NAME;
+import static com.lulippe.safetynetalerts.model.enums.DataNameEnum.LAST_NAME;
 import static com.lulippe.safetynetalerts.utils.LogUtil.logPersonNotFound;
-import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateLastNameAndFirstName;
+import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateStringsData;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
@@ -39,7 +40,7 @@ public class PersonService {
      * @throws ObjectAlreadyExistsException if a person with the same name already exists.
      */
     public void handlePersonCreationRequest(final PersonDto personCreateDto) {
-        validateLastNameAndFirstName(personCreateDto.getFirstName(), personCreateDto.getLastName());
+        validateStringsData(personCreateDto.getFirstName(), personCreateDto.getLastName(),FIRST_NAME.getValue(),LAST_NAME.getValue());
         cleanPersonDto(personCreateDto);
         if (isPersonExist(personCreateDto.getFirstName(), personCreateDto.getLastName())) {
             log.error("Person already exists with first name {} and last name {}", personCreateDto.getFirstName(), personCreateDto.getLastName());
@@ -58,7 +59,7 @@ public class PersonService {
      * @param personUpdateDto The DTO containing the updated data for the person.
      */
     public void handlePersonUpdateRequest(final PersonDto personUpdateDto) {
-        validateLastNameAndFirstName(personUpdateDto.getFirstName(), personUpdateDto.getLastName());
+        validateStringsData(personUpdateDto.getFirstName(), personUpdateDto.getLastName(),FIRST_NAME.getValue(),LAST_NAME.getValue());
         cleanPersonDto(personUpdateDto);
         updatePerson(personUpdateDto);
     }
@@ -74,7 +75,7 @@ public class PersonService {
      * @throws InexistantObjectException if the person does not exist.
      */
     public void handlePersonDeleteRequest(final String firstName, final String lastName) {
-        validateLastNameAndFirstName(lastName, firstName);
+        validateStringsData(firstName, lastName,FIRST_NAME.getValue(),LAST_NAME.getValue());
         String cleanFirstName = firstName.trim();
         String cleanLastName = lastName.trim();
         deletePersonByFirstNameAndLastName(cleanFirstName, cleanLastName);
