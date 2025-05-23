@@ -20,6 +20,7 @@ public class FloodController implements FloodApi {
     public ResponseEntity<List<PersonInformationByStationNumber>> getResidentsInformationsByStationNumbers(final List<Integer> stations) {
         log.info("getting persons informations by stations");
         final List<PersonInformationByStationNumber> personInformationByStationNumbersList = floodService.getResidentsInformationsByStationNumbers(stations);
+        log.info("persons informations by stations retrieved successfully");
         return ResponseEntity.ok(personInformationByStationNumbersList);
     }
 }

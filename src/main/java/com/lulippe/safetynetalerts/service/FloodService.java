@@ -25,7 +25,10 @@ public class FloodService {
     public List<PersonInformationByStationNumber> getResidentsInformationsByStationNumbers(final List<Integer> stationsNumber) {
         return Optional.ofNullable(stationsNumber)
                 .filter(l -> !l.isEmpty())
-                .orElseThrow(() -> new InvalidDataException("Invalid stations number"))
+                .orElseThrow(() -> {
+                    log.error("invalid stationsNumber list");
+                    return new InvalidDataException("Invalid stations number list");
+                })
                 .stream()
                 .peek(this::validateStationNumber)
                 .map(this::getPersonInformationByStationNumber)
@@ -54,6 +57,7 @@ public class FloodService {
 
     private void validateStationNumber(Integer number) {
         if (number == null || number <= 0) {
+            log.error("Invalid stations number");
             throw new InvalidDataException("Invalid stations number");
         }
     }
