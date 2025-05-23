@@ -7,25 +7,16 @@ import com.lulippe.safetynetalerts.mapper.FireMapper;
 import com.lulippe.safetynetalerts.model.FireStation;
 import com.lulippe.safetynetalerts.model.MedicalRecord;
 import com.lulippe.safetynetalerts.model.Person;
-import com.lulippe.safetynetalerts.model.enums.DataNameEnum;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
-import org.joda.time.Years;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static com.lulippe.safetynetalerts.model.enums.DataNameEnum.ADDRESS;
-import static com.lulippe.safetynetalerts.model.enums.DataNameEnum.BIRTHDATE;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.normalizeAndValidate;
-import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateData;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
@@ -68,6 +59,9 @@ public class FireService {
 
     private FireStation getFireStation(final String address) {
         return fireStationService.findFireStationByAddress(address)
-                .orElseThrow(() -> new InexistantObjectException("No fireStation for this address"));
+                .orElseThrow(() -> {
+                    log.error("No Fire station with address {} found", address);
+                    return new InexistantObjectException("No fireStation for this address");
+                });
     }
 }

@@ -132,6 +132,7 @@ public class FireStationService {
                 .orElseThrow(() -> new InexistantObjectException("fireStation does not exist with this address: " + fireStationDto.getAddress()));
 
         if (existingFireStation.getStation().equals(fireStationDto.getStation())) {
+            log.error("fireStation already exists with this address {} and station number {}", fireStationDto.getAddress(), fireStationDto.getStation());
             throw new ObjectAlreadyExistsException("fireStation already exists with this address and station number");
         }
         return existingFireStation;
@@ -143,8 +144,11 @@ public class FireStationService {
             throw new InvalidDataException("Invalid station, please enter a valid number");
         }
         return findFireStationByAddressAndStation(fireStationDto.getAddress(), fireStationDto.getStation())
-                .orElseThrow(() -> new InexistantObjectException("fireStation does not exist with this address and this station: address : "
-                        + fireStationDto.getAddress() + ", station : " + fireStationDto.getStation()));
+                .orElseThrow(() -> {
+                    log.error("fireStation does not exist with this address {} and this station {}", fireStationDto.getAddress(), fireStationDto.getStation());
+                    return new InexistantObjectException("fireStation does not exist with this address and this station: address : "
+                            + fireStationDto.getAddress() + ", station : " + fireStationDto.getStation());
+                });
     }
 
     private Optional<FireStation> findFireStationByAddressAndStation(final String address, final String station) {
@@ -186,6 +190,7 @@ public class FireStationService {
                     .filter(list -> !list.isEmpty())
                     .orElseThrow(() -> new InexistantObjectException("No fireStations found for this station number: " + stationNumber));
         }
+        log.error("Invalid station number: {}", stationNumber);
         throw new InvalidDataException("Invalid station, please enter a valid number");
     }
 
@@ -193,6 +198,7 @@ public class FireStationService {
         final List<FireStation> fireStationList = fireStationRepository.findByStation(String.valueOf(stationNumber));
 
         if (fireStationList.isEmpty()) {
+            log.error("No fireStation found for {}", stationNumber);
             throw new InexistantObjectException("No fireStations found for this station number: " + stationNumber);
         }
         return fireStationList;

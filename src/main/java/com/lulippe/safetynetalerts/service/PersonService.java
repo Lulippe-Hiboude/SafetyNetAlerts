@@ -147,7 +147,10 @@ public class PersonService {
 
     public Set<String> getEmailListByCity(final String city) {
         final List<Person> personList = personRepository.getAllPersonsByCity(city)
-                .orElseThrow(() -> new InexistantObjectException("No Person found for this city" + city));
+                .orElseThrow(() -> {
+                    log.error("No Person found for city : {}", city);
+                    return new InexistantObjectException("No Person found for this city" + city);
+                });
 
         return personList.stream()
                 .map(person -> {
@@ -162,6 +165,9 @@ public class PersonService {
 
     public List<Person> getAllPersonsByLastName(final String lastName) {
         return personRepository.getAllPersonsByLastName(lastName)
-                .orElseThrow(() -> new InexistantObjectException("No Person found for this last name: " + lastName));
+                .orElseThrow(() -> {
+                    log.error("No Person found for this last name: {}", lastName);
+                    return new InexistantObjectException("No Person found for this last name: " + lastName);
+                });
     }
 }
