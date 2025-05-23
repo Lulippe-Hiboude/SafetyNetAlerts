@@ -11,7 +11,6 @@ import com.lulippe.safetynetalerts.medicalRecord.model.MedicationUpdateEntry;
 import com.lulippe.safetynetalerts.model.MedicalRecord;
 import com.lulippe.safetynetalerts.repository.MedicalRecordRepository;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -27,18 +26,16 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.lulippe.safetynetalerts.service.FireService.BIRTHDATE;
+import static com.lulippe.safetynetalerts.model.enums.DataNameEnum.*;
 import static com.lulippe.safetynetalerts.utils.LogUtil.logMedicalRecordNotFound;
-import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateLastNameAndFirstName;
-import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateData;
+import static com.lulippe.safetynetalerts.utils.ValidationUtil.*;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 @Service
 public class MedicalRecordService {
     private final MedicalRecordRepository medicalRecordRepository;
-    final static String MEDICATION = "Medication";
-    final static String ALLERGY = "Allergy";
+
     /**
      * Handles the creation process of a new {@link MedicalRecord}.
      * <p>
@@ -51,7 +48,7 @@ public class MedicalRecordService {
      * @throws ObjectAlreadyExistsException if a medical record with the same first and last name already exists.
      */
     public void handleMedicalRecordCreationRequest(MedicalRecordDto medicalRecordCreateDto) {
-        validateLastNameAndFirstName(medicalRecordCreateDto.getFirstName(), medicalRecordCreateDto.getLastName());
+        validateStringsData(medicalRecordCreateDto.getFirstName(), medicalRecordCreateDto.getLastName(),FIRST_NAME.getValue(),LAST_NAME.getValue());
         cleanMedicalRecordDto(medicalRecordCreateDto);
 
         if (isMedicalRecordExists(medicalRecordCreateDto.getLastName(), medicalRecordCreateDto.getFirstName())) {
@@ -75,7 +72,7 @@ public class MedicalRecordService {
      * @throws ObjectAlreadyExistsException or {@link InexistantObjectException} for invalid medication or allergy updates.
      */
     public void handleMedicalRecordUpdateRequest(MedicalRecordUpdateDto medicalRecordUpdateDto) {
-        validateLastNameAndFirstName(medicalRecordUpdateDto.getFirstName(), medicalRecordUpdateDto.getLastName());
+        validateStringsData(medicalRecordUpdateDto.getFirstName(), medicalRecordUpdateDto.getLastName(),FIRST_NAME.getValue(),LAST_NAME.getValue());
         cleanMedicalRecordUpdateDto(medicalRecordUpdateDto);
         final MedicalRecord existingMedicalRecord = getMedicalRecordByFirstNameAndLastName(medicalRecordUpdateDto.getFirstName(), medicalRecordUpdateDto.getLastName());
         validateMedicationUpdate(existingMedicalRecord.getMedications(), medicalRecordUpdateDto.getMedications());
@@ -95,14 +92,14 @@ public class MedicalRecordService {
      * @throws InexistantObjectException if no medical record is found for the given name.
      */
     public void handleMedicalRecordDeleteRequest(final String firstName, final String lastName) {
-        validateLastNameAndFirstName(lastName, firstName);
+        validateStringsData(firstName, lastName,FIRST_NAME.getValue(),LAST_NAME.getValue());
         String cleanFirstName = firstName.trim();
         String cleanLastName = lastName.trim();
         deleteMedicalRecordByFullName(cleanFirstName, cleanLastName);
     }
 
     public int calculatePersonAge(final String birthdate) {
-        validateData(birthdate,BIRTHDATE);
+        validateData(birthdate, BIRTHDATE.getValue());
         DateTimeFormatter formatter = DateTimeFormat.forPattern("MM/dd/yyyy");
         DateTime birth = formatter.parseDateTime(birthdate);
         DateTime now = DateTime.now();
@@ -132,13 +129,13 @@ public class MedicalRecordService {
         }
         if (!medicalRecordDto.getAllergies().isEmpty()) {
             medicalRecordDto.setAllergies(medicalRecordDto.getAllergies().stream()
-                    .map(allergy -> normalizeAndValidateName(allergy,ALLERGY))
+                    .map(allergy -> normalizeAndValidateName(allergy, ALLERGY.getValue()))
                     .collect(Collectors.toList()));
         }
 
         if (!medicalRecordDto.getMedications().isEmpty()) {
             medicalRecordDto.setMedications(medicalRecordDto.getMedications().stream()
-                    .map(medication -> normalizeAndValidateName(medication,MEDICATION))
+                    .map(medication -> normalizeAndValidateName(medication, MEDICATION.getValue()))
                     .map(s -> s.replaceAll("\\s*:\\s*", ":"))
                     .collect(Collectors.toList()));
         }
@@ -196,7 +193,7 @@ public class MedicalRecordService {
      */
     private void cleanAllergyUpdate(List<AllergyUpdateEntry> updateAllergies) {
         updateAllergies.forEach(allergy -> {
-            allergy.setName(normalizeAndValidateName(allergy.getName(),ALLERGY));
+            allergy.setName(normalizeAndValidateName(allergy.getName(), ALLERGY.getValue()));
         });
     }
 
@@ -241,7 +238,7 @@ public class MedicalRecordService {
      */
     private void cleanMedicationUpdate(List<MedicationUpdateEntry> updateMedications) {
         updateMedications.forEach(medication -> {
-            medication.setMedication(normalizeAndValidateName(medication.getMedication(),MEDICATION));
+            medication.setMedication(normalizeAndValidateName(medication.getMedication(), MEDICATION.getValue()));
             medication.setMedication(medication.getMedication().replaceAll("\\s*:\\s*", ":"));
         });
     }
@@ -313,8 +310,8 @@ public class MedicalRecordService {
      * Applies a list of update operations (ADD, REMOVE, UPDATE) to the existing medications list.
      * Each operation is executed in the order it appears in the update list.
      *
-     * @param updateMedications the list of {@link MedicationUpdateEntry} to apply.
-     *                          Can be null or empty, in which case no changes are made.
+     * @param updateMedications   the list of {@link MedicationUpdateEntry} to apply.
+     *                            Can be null or empty, in which case no changes are made.
      * @param existingMedications the list of current medications to be updated.
      */
     private void applyMedicationsUpdates(List<MedicationUpdateEntry> updateMedications, List<String> existingMedications) {
@@ -344,7 +341,7 @@ public class MedicalRecordService {
      * Assumes that the medication has already been validated to exist in the list.
      *
      * @param existingMedications the list of current medications.
-     * @param updateMedication the medication update entry containing the new value.
+     * @param updateMedication    the medication update entry containing the new value.
      */
     private void applyUpdateMedicationOperation(List<String> existingMedications, MedicationUpdateEntry updateMedication) {
         String medicationNameToUpdate = getMedicationName(updateMedication.getMedication());
@@ -361,8 +358,8 @@ public class MedicalRecordService {
      * Applies a list of update operations (ADD, REMOVE) to the existing allergies list.
      * Each operation is executed in the order it appears in the update list.
      *
-     * @param updateAllergies the list of {@link AllergyUpdateEntry} to apply.
-     *                        Can be null or empty, in which case no changes are made.
+     * @param updateAllergies   the list of {@link AllergyUpdateEntry} to apply.
+     *                          Can be null or empty, in which case no changes are made.
      * @param existingAllergies the list of current allergies to be updated.
      */
     private void applyAllergiesUpdates(final List<AllergyUpdateEntry> updateAllergies, @NotNull final List<String> existingAllergies) {
@@ -382,7 +379,7 @@ public class MedicalRecordService {
     }
 
     private String normalizeAndValidateName(String value, String nameValue) {
-        validateData(value,nameValue);
+        validateData(value, nameValue);
         return value.trim().toLowerCase();
     }
 

@@ -76,7 +76,7 @@ public class PersonInfoLastNameControllerIT {
         mockMvc.perform(get("/personInfoLastName")
                         .param("lastName", lastName))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("lastName cannot be null or empty" +lastName));
+                .andExpect(MockMvcResultMatchers.content().string("last name cannot be null or empty" +lastName));
     }
 
     @Test

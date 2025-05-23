@@ -10,13 +10,6 @@ import org.slf4j.LoggerFactory;
 public class ValidationUtil {
     private static final Logger log = LoggerFactory.getLogger(ValidationUtil.class);
 
-    public static void validateLastNameAndFirstName(final String firstName, final String lastName) {
-        if (Strings.isBlank(firstName) || Strings.isBlank(lastName)) {
-            log.error("Invalid data: firstName or lastName is blank. firstName: '{}', lastName: '{}'", firstName, lastName);
-            throw new InvalidDataException("firstName or LastName is blank: " + firstName + ", " + lastName);
-        }
-    }
-
     public static void validateStringsData(final String firstData, final String secondData,
                                            final String firstDataName, final String secondDataName) {
         if (Strings.isBlank(firstData) || Strings.isBlank(secondData)) {

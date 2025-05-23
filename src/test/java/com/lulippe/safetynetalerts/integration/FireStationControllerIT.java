@@ -108,7 +108,7 @@ public class FireStationControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(fireStationDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("fireStation address or fireStation number is blank: " + address + ", " + station));
+                .andExpect(MockMvcResultMatchers.content().string("fire station address or fire station number is blank: " + address + ", " + station));
         DataContainer updatedData = dataManager.getDataContainer();
         assertEquals(1, updatedData.getFireStations().size());
         assertTrue(updatedData.getFireStations().stream()
@@ -271,7 +271,7 @@ public class FireStationControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(fireStationDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("fireStation address or fireStation number is blank: " + address + ", " + station));
+                .andExpect(MockMvcResultMatchers.content().string("fire station address or fire station number is blank: " + address + ", " + station));
         DataContainer updatedData = dataManager.getDataContainer();
         assertEquals(1, updatedData.getFireStations().size());
         assertTrue(updatedData.getFireStations().stream()
@@ -385,7 +385,7 @@ public class FireStationControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(fireStationDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("fireStation address or fireStation number is blank: " + address + ", " + station));
+                .andExpect(MockMvcResultMatchers.content().string("fire station address or fire station number is blank: " + address + ", " + station));
         DataContainer updatedData = dataManager.getDataContainer();
         assertEquals(1, updatedData.getFireStations().size());
         assertTrue(updatedData.getFireStations().stream()

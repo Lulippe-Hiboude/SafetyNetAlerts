@@ -124,7 +124,7 @@ class PersonControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(personCreateDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("firstName or LastName is blank: " + personCreateDto.getFirstName() + ", " + personCreateDto.getLastName()));
+                .andExpect(MockMvcResultMatchers.content().string("first name or last name is blank: " + personCreateDto.getFirstName() + ", " + personCreateDto.getLastName()));
         DataContainer updatedData = dataManager.getDataContainer();
         assertEquals(2, updatedData.getPersons().size());
         assertTrue(updatedData.getPersons().stream()
@@ -227,7 +227,7 @@ class PersonControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(personUpdateDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("firstName or LastName is blank: " + personUpdateDto.getFirstName() + ", " + personUpdateDto.getLastName()));
+                .andExpect(MockMvcResultMatchers.content().string("first name or last name is blank: " + personUpdateDto.getFirstName() + ", " + personUpdateDto.getLastName()));
         DataContainer updatedData = dataManager.getDataContainer();
         assertEquals(2, updatedData.getPersons().size());
         assertTrue(updatedData.getPersons().stream()
@@ -319,6 +319,6 @@ class PersonControllerIT {
                         .param("lastName", lastName)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("firstName or LastName is blank: " + lastName + ", " + firstName));
+                .andExpect(MockMvcResultMatchers.content().string("first name or last name is blank: " + firstName+", "+lastName));
     }
 }

@@ -10,17 +10,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
+import static com.lulippe.safetynetalerts.model.enums.DataNameEnum.CITY;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateData;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 @Service
 public class CommunityEmailService {
-    private static final String CITY = "city";
     private final PersonService personService;
 
     public CommunityEmailList getCommunityEmailList(final String city) {
-        validateData(city, CITY);
+        validateData(city, CITY.getValue());
         final Set<String> mailList = personService.getEmailListByCity(city);
         return CommunityEmailMapper.INSTANCE.toCommunityEmailList(mailList);
     }

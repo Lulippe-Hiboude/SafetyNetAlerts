@@ -10,18 +10,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.lulippe.safetynetalerts.model.enums.DataNameEnum.LAST_NAME;
 import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateData;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class PersonInfoLastNameService {
-    private static final String LAST_NAME = "lastName";
     private final PersonService personService;
     private final MedicalRecordService medicalRecordService;
 
     public List<ResidentInformation> getPersonInfoLastName(final String lastName) {
-        validateData(lastName, LAST_NAME);
+        validateData(lastName, LAST_NAME.getValue());
         final List<Person> personsByLastName = personService.getAllPersonsByLastName(lastName);
         return personsByLastName.stream()
                 .map(person -> {

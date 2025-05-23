@@ -1,6 +1,5 @@
 package com.lulippe.safetynetalerts.utils;
 
-import com.lulippe.safetynetalerts.medicalRecord.model.MedicationOperationType;
 import lombok.experimental.UtilityClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

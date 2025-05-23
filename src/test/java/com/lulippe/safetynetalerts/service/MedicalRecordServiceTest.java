@@ -4,7 +4,9 @@ import com.lulippe.safetynetalerts.exception.entity_exception.InexistantObjectEx
 import com.lulippe.safetynetalerts.exception.entity_exception.InvalidDataException;
 import com.lulippe.safetynetalerts.exception.entity_exception.ObjectAlreadyExistsException;
 import com.lulippe.safetynetalerts.medicalRecord.model.*;
+import com.lulippe.safetynetalerts.model.FireStation;
 import com.lulippe.safetynetalerts.model.MedicalRecord;
+import com.lulippe.safetynetalerts.model.Person;
 import com.lulippe.safetynetalerts.repository.MedicalRecordRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -1020,4 +1022,28 @@ class MedicalRecordServiceTest {
         assertEquals(41,expectedAge);
     }
 
+    @Test
+    @DisplayName("should throw InvalidDataException If Birthdate Is Null Or Blank")
+    void shouldThrowInvalidDataExceptionIfBirthdateIsNullOrBlank() {
+        //given
+
+        final String firstName = "John";
+        final String lastName = "Doe";
+
+        final List<String> medications = new ArrayList<>();
+        medications.add("paracetamol : 1000mg");
+        medications.add("aznol:350mg");
+        final List<String> allergies = new ArrayList<>();
+        allergies.add("dust");
+        final MedicalRecord medicalRecord = MedicalRecord.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .birthdate("")
+                .medications(medications)
+                .allergies(allergies)
+                .build();
+
+        //when & then
+        assertThrows(InvalidDataException.class, () -> medicalRecordService.calculatePersonAge(medicalRecord.getBirthdate()));
+    }
 }
