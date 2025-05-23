@@ -26,7 +26,6 @@ import static com.lulippe.safetynetalerts.utils.ValidationUtil.validateData;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
-@Data
 @Service
 public class FireService {
     private final FireStationService fireStationService;

@@ -15,7 +15,7 @@ public class FireController implements FireApi {
     private final FireService fireService;
 
     @Override
-    public ResponseEntity<FireAddressResponse> getFireResponse(String address) {
+    public ResponseEntity<FireAddressResponse> getFireResponse(final String address) {
         log.info("getting FireAddressResponse for address {}", address);
         final FireAddressResponse fireAddressResponse = fireService.handleFireRequest(address);
         return ResponseEntity.ok(fireAddressResponse);

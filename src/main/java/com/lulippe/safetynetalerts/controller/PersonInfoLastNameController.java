@@ -16,7 +16,7 @@ import java.util.List;
 public class PersonInfoLastNameController implements PersonInfoLastNameApi {
     private final PersonInfoLastNameService personInfoLastNameService;
     @Override
-    public ResponseEntity<List<ResidentInformation>> getPersonInfoLastName(String lastName) {
+    public ResponseEntity<List<ResidentInformation>> getPersonInfoLastName(final String lastName) {
         log.info("getting Resident Information by last name");
         final List<ResidentInformation> residentInformationList = personInfoLastNameService.getPersonInfoLastName(lastName);
         return ResponseEntity.ok(residentInformationList);
