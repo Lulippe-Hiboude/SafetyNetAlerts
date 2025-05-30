@@ -15,7 +15,7 @@ paths:
   /fire:
     get:
       tags:
-        - "Fire"
+        - "fire"
       summary: "List of all Persons living at a given address, including their medical records and the fireStation number serving that address"
       operationId: getFireResponse
       parameters:

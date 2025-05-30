@@ -15,7 +15,7 @@ paths:
   /childAlert:
     get:
       tags:
-        - "Child Alert"
+        - "childAlert"
       summary: "List of all children living at a given address, including the other household members"
       operationId: getChildAlertResponse
       parameters:
