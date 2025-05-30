@@ -33,7 +33,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FireStationCoverageResponse'
         '404':
-          description: "No residents found for this station number or no fire station found for this station number"
+          description: "No fire station found for this station number"
         '400':
           description: "Invalid input"
     post:

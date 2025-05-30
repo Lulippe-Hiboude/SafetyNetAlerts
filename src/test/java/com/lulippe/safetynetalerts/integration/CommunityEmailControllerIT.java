@@ -82,7 +82,7 @@ public class CommunityEmailControllerIT {
         mockMvc.perform(get("/communityEmail")
                         .param("city", city))
                 .andExpect(status().isNotFound())
-                .andExpect(MockMvcResultMatchers.content().string("No Person found for this city" + city));
+                .andExpect(MockMvcResultMatchers.content().string("No Person found for this city :" + city));
     }
 
 }

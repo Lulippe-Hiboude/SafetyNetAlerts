@@ -15,7 +15,7 @@ paths:
   /communityEmail:
     get:
       tags:
-        - "CommunityEmail"
+        - "communityEmail"
       summary: "List of mail of all residents in a given city"
       operationId: getCommunityEmail
       parameters:

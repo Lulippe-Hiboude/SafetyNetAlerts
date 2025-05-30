@@ -15,7 +15,7 @@ paths:
   /medicalRecord:
     post:
       tags:
-        - "MedicalRecords"
+        - "medicalRecords"
       summary: "Create a new medicalRecord"
       operationId: "createNewMedicalRecord"
       requestBody:
@@ -37,7 +37,7 @@ paths:
           description: "the medicalRecord for this person already exists"
     put:
       tags:
-        - "MedicalRecords"
+        - "medicalRecords"
       summary: "Update a existing medicalRecord"
       operationId: "updateMedicalRecord"
       requestBody:
@@ -62,7 +62,7 @@ paths:
           description: "the medication or the allergy already exists for add operation"
     delete:
       tags:
-        - "MedicalRecords"
+        - "medicalRecords"
       summary: "delete an existing medical record"
       operationId: "deleteMedicalRecord"
       parameters:

@@ -149,7 +149,7 @@ public class PersonService {
         final List<Person> personList = personRepository.getAllPersonsByCity(city)
                 .orElseThrow(() -> {
                     log.error("No Person found for city : {}", city);
-                    return new InexistantObjectException("No Person found for this city" + city);
+                    return new InexistantObjectException("No Person found for this city :" + city);
                 });
 
         return personList.stream()
