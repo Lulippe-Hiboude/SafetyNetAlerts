@@ -38,6 +38,17 @@ public class FireStationService {
     private final PersonService personService;
     private final MedicalRecordService medicalRecordService;
 
+    /**
+     * Retrieves all residents covered by a given fire station number.
+     * This includes a list of residents living at addresses served by the station,
+     * along with statistics on the number of adults and children.
+     *
+     * @param stationNumber the fire station number (raw or unvalidated input).
+     * @return a {@link FireStationCoverageResponse} object containing the list of residents
+     *         and age group statistics (adults/children).
+     * @throws IllegalArgumentException if the station number is invalid
+     *         or no corresponding fire station is found.
+     */
     public FireStationCoverageResponse getResidentsByFireStation(final String stationNumber) {
         final String cleanStationNumber = normalizeAndValidate(stationNumber, STATION_NUMBER.getValue());
         final List<FireStation> fireStations = getFireStation(stationNumber, cleanStationNumber);
@@ -54,6 +65,14 @@ public class FireStationService {
         return FireStationMapper.INSTANCE.toFireStationCoverageResponse(residents, counts);
     }
 
+    /**
+     * Handles the creation request of a new fire station from the provided DTO.
+     * This includes validation, cleaning, duplicate checking, and persistence of the new station.
+     *
+     * @param fireStationCreateDto the DTO containing the address and station number to create.
+     * @throws IllegalArgumentException if the provided data is invalid
+     *         or if a fire station with the same data already exists.
+     */
     public void handleFireStationCreationRequest(final FireStationDto fireStationCreateDto) {
         validateStringsData(fireStationCreateDto.getAddress(), fireStationCreateDto.getStation(),
                 FIRE_STATION_ADDRESS.getValue(), FIRE_STATION_NUMBER.getValue());
@@ -62,6 +81,14 @@ public class FireStationService {
         createFireStation(fireStationCreateDto);
     }
 
+    /**
+     * Handles the update request for an existing fire station.
+     * Validates and cleans the provided data, then updates the corresponding fire station.
+     *
+     * @param fireStationUpdateDto the DTO containing the address and the new station number.
+     * @throws InexistantObjectException if the fire station to update does not exist.
+     * @throws IllegalArgumentException if the provided data is invalid.
+     */
     public void handleFireStationUpdateRequest(final FireStationDto fireStationUpdateDto) {
         validateStringsData(fireStationUpdateDto.getAddress(), fireStationUpdateDto.getStation(),
                 FIRE_STATION_ADDRESS.getValue(), FIRE_STATION_NUMBER.getValue());
@@ -70,6 +97,14 @@ public class FireStationService {
         updateFireStation(fireStationUpdateDto, existingFireStation);
     }
 
+    /**
+     * Handles the deletion request for a fire station.
+     * Validates and cleans the provided data, then deletes the corresponding fire station.
+     *
+     * @param fireStationDeleteDto the DTO containing the address and station number to delete.
+     * @throws InexistantObjectException if the fire station to delete does not exist.
+     * @throws IllegalArgumentException if the provided data is invalid.
+     */
     public void handleFireStationDeleteRequest(final FireStationDto fireStationDeleteDto) {
         validateStringsData(fireStationDeleteDto.getAddress(), fireStationDeleteDto.getStation(),
                 FIRE_STATION_ADDRESS.getValue(), FIRE_STATION_NUMBER.getValue());
