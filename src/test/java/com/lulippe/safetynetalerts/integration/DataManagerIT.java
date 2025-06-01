@@ -1,10 +1,8 @@
-package com.lulippe.safetynetalerts.repository.manager;
+package com.lulippe.safetynetalerts.integration;
 
 import com.lulippe.safetynetalerts.dao.DataContainer;
 import com.lulippe.safetynetalerts.exception.json_exception.DataLoadingException;
-import com.lulippe.safetynetalerts.model.FireStation;
-import com.lulippe.safetynetalerts.model.MedicalRecord;
-import com.lulippe.safetynetalerts.model.Person;
+import com.lulippe.safetynetalerts.repository.manager.DataManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
 @ActiveProfiles("test")
-class DataManagerTest {
+class DataManagerIT {
     @Autowired
     private DataManager dataManager;
 
@@ -34,18 +31,6 @@ class DataManagerTest {
 
         //then
         assertNotNull(dataContainer);
-        DataContainer expectedDataContainer = new DataContainer();
-        expectedDataContainer.setPersons(List.of(
-                new Person("Johnny", "Boyd", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com")
-        ));
-        expectedDataContainer.setFireStations(List.of(
-                new FireStation("1509 Culver St", "3")
-        ));
-        expectedDataContainer.setMedicalRecords(List.of(
-                new MedicalRecord("John", "Boyd", "03/06/1984",
-                        List.of("aznol:350mg", "hydrapermazol:100mg"), List.of("nillacilan"))
-        ));
-
         assertEquals(2, dataContainer.getPersons().size());
         assertEquals("Johnny", dataContainer.getPersons().getFirst().getFirstName());
         assertEquals("Boyd", dataContainer.getPersons().getFirst().getLastName());
@@ -70,14 +55,14 @@ class DataManagerTest {
     @DisplayName("Should throw a DataLoadingException if file does not exist")
     void shouldThrowDataLoadingExceptionIfFileDoesNotExist() throws Exception {
         //given
-        Field filePathField = DataManager.class.getDeclaredField("filePath");
+        Field filePathField = DataManager.class.getDeclaredField("resourceFilePath");
         filePathField.setAccessible(true);
-        filePathField.set(dataManager, "src/test/resources/json/inexistant.json");
+        filePathField.set(dataManager, "json/inexistant.json");
 
         //when & then
         assertThatThrownBy(() -> dataManager.loadData())
                 .isInstanceOf(DataLoadingException.class)
-                .hasMessageContaining("the file does not exist");
+                .hasMessageContaining("Failed to load resource file: json/inexistant.json");
     }
 
     @Test

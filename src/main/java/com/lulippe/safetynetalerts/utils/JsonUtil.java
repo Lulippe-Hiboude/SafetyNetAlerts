@@ -3,11 +3,14 @@ package com.lulippe.safetynetalerts.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lulippe.safetynetalerts.dao.DataContainer;
 import com.lulippe.safetynetalerts.exception.json_exception.DataLoadingException;
 import com.lulippe.safetynetalerts.repository.manager.DataManager;
 import lombok.experimental.UtilityClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.UncheckedIOException;
 
 /**
  * Utility class for JSON serialization and deserialization.
@@ -36,6 +39,16 @@ public class JsonUtil {
         } catch (JsonProcessingException e) {
             logger.error("The file is malformed: {} - Error: {}", json, e.getMessage(), e);
             throw new DataLoadingException("The file is malformed: " + json + " - Error: " + e.getMessage(), e);
+        }
+    }
+
+    public static String toJson(DataContainer dataContainer) {
+        try {
+            return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(dataContainer);
+        } catch (JsonProcessingException e) {
+            LoggerFactory.getLogger(JsonUtil.class)
+                    .error("Failed to serialize DataContainer: {}", e.getMessage(), e);
+            throw new UncheckedIOException("Failed to serialize DataContainer", e);
         }
     }
 }
